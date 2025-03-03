@@ -20,7 +20,7 @@ public class FormTemplate {
 
     private String name;
 
-    @Column(columnDefinition = "text")
+    @Column(name = "form_structure", columnDefinition = "text")
     private String formStructure;
 
     @CreationTimestamp

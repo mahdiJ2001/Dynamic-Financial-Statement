@@ -1,0 +1,9 @@
+camunda:
+  bpm:
+    generic-properties:
+      properties:
+        history-time-to-live: 180
+    admin-user:
+      id: demo
+      password: demo
+
