@@ -17,11 +17,11 @@ public class FinancialStatement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "form_data", columnDefinition = "jsonb")
-    private String formData; // JSON contenant les valeurs remplies
+    @Column(name = "form_data", columnDefinition = "TEXT")
+    private String formData;  // Form data stored as String (JSON)
 
-    @Column(name = "analysis_result", columnDefinition = "jsonb")
-    private String analysisResult; // Résultat de l'analyse après application des règles
+    @Column(name = "analysis_result", columnDefinition = "TEXT")
+    private String analysisResult; // Analysis result stored as String (JSON)
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();

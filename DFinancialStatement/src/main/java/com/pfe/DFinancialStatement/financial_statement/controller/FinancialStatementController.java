@@ -16,10 +16,15 @@ public class FinancialStatementController {
     @Autowired
     private FinancialStatementService financialStatementService;
 
+
     @PostMapping
-    public ResponseEntity<FinancialStatementDTO> saveFinancialStatement(@RequestBody FinancialStatementDTO dto) {
-        FinancialStatementDTO savedStatement = financialStatementService.saveFinancialStatement(dto);
-        return ResponseEntity.ok(savedStatement);
+    public ResponseEntity<String> saveFinancialStatement(@RequestBody String formData) {
+
+        FinancialStatementDTO dto = new FinancialStatementDTO();
+        dto.setFormData(formData);
+
+        String analysisResult = financialStatementService.saveFinancialStatement(dto);
+        return ResponseEntity.ok(analysisResult);
     }
 
     @GetMapping
