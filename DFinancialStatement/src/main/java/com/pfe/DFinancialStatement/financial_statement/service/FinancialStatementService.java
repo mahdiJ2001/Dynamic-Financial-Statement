@@ -32,9 +32,8 @@ public class FinancialStatementService {
         FinancialStatement entity = financialStatementMapper.toEntity(dto);
         entity.setAnalysisResult(analysisResult);
 
-        // Ensure that createdAt is set before saving
         if (entity.getCreatedAt() == null) {
-            entity.setCreatedAt(LocalDateTime.now());  // Explicitly set the createdAt if it's null
+            entity.setCreatedAt(LocalDateTime.now());
         }
 
         financialStatementRepository.save(entity);
@@ -50,17 +49,16 @@ public class FinancialStatementService {
         }
 
         try {
-            // Parse formData JSON string into a JSONObject
+
             JSONObject formJson = new JSONObject(formData);
 
-            // Ensure "formStructure" exists and is a valid JSON object
             if (!formJson.has("formStructure")) {
                 return "{\"error\": \"Missing 'formStructure' key\"}";
             }
 
             JSONObject formStructure = new JSONObject(formJson.getString("formStructure"));
 
-            // Validate that the required keys are present
+
             if (!formStructure.has("actif") || !formStructure.has("passif")) {
                 return "{\"error\": \"Missing 'actif' or 'passif' data\"}";
             }
