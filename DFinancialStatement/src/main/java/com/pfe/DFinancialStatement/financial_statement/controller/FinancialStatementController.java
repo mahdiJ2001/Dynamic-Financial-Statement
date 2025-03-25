@@ -16,17 +16,6 @@ public class FinancialStatementController {
     @Autowired
     private FinancialStatementService financialStatementService;
 
-
-    @PostMapping
-    public ResponseEntity<String> saveFinancialStatement(@RequestBody String formData) {
-
-        FinancialStatementDTO dto = new FinancialStatementDTO();
-        dto.setFormData(formData);
-
-        String analysisResult = financialStatementService.saveFinancialStatement(dto);
-        return ResponseEntity.ok(analysisResult);
-    }
-
     @GetMapping
     public ResponseEntity<List<FinancialStatementDTO>> getAllFinancialStatements() {
         List<FinancialStatementDTO> statements = financialStatementService.getAllFinancialStatements();
@@ -37,5 +26,15 @@ public class FinancialStatementController {
     public ResponseEntity<FinancialStatementDTO> getFinancialStatementById(@PathVariable Long id) {
         Optional<FinancialStatementDTO> statement = financialStatementService.getFinancialStatementById(id);
         return statement.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<String> evaluateAndSaveFinancialStatement(
+            @RequestBody FinancialStatementDTO financialStatementDTO,
+            @RequestParam String ruleKey) {
+
+        String result = financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey);
+
+        return ResponseEntity.ok(result);
     }
 }

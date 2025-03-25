@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class FinancialStatementDTO {
-    private String formData;       // Form data stored as String (JSON)
-    private String analysisResult; // Analysis result stored as String (JSON)
+    private String formData;
+    private String analysisResult;
     private LocalDateTime createdAt;
 }

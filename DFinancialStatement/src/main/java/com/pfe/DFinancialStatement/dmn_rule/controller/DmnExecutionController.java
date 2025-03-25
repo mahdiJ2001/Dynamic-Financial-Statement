@@ -20,14 +20,12 @@ public class DmnExecutionController {
         this.dmnExecutionService = dmnExecutionService;
     }
 
-    @GetMapping("/evaluateRisk")
-    public String evaluateRisk(
-            @RequestParam String ruleKey,
-            @RequestParam double ratioEndettement,
-            @RequestParam double ratioLiquidite,
-            @RequestParam double ratioSolvabilite) {
-        return dmnExecutionService.evaluateRisk(ruleKey, ratioEndettement, ratioLiquidite, ratioSolvabilite);
+    @GetMapping("/dmn")
+    public ResponseEntity<List<DmnRule>> getAllDmnRules() {
+        List<DmnRule> dmnRules = dmnExecutionService.getAllDmnRules();
+        return ResponseEntity.ok(dmnRules);
     }
+
 
     @PostMapping("/dmn/import")
     public ResponseEntity<?> importDmn(
@@ -47,11 +45,9 @@ public class DmnExecutionController {
         }
     }
 
-    // Nouvel endpoint pour récupérer les DMN compatibles
-    // On passe ici une chaîne de caractères contenant les champs du template séparés par des virgules
     @GetMapping("/dmn/compatible")
     public ResponseEntity<?> getCompatibleDmns(@RequestParam("fields") String fields) {
-        // Convertir la chaîne en ensemble de champs
+
         Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));
         List<DmnRule> compatibleDmns = dmnExecutionService.findCompatibleDmns(formFields);
         return ResponseEntity.ok(compatibleDmns);
