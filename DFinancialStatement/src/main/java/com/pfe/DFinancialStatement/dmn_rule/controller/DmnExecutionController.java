@@ -47,9 +47,9 @@ public class DmnExecutionController {
 
     @GetMapping("/dmn/compatible")
     public ResponseEntity<?> getCompatibleDmns(@RequestParam("fields") String fields) {
-
         Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));
-        List<DmnRule> compatibleDmns = dmnExecutionService.findCompatibleDmns(formFields);
+        List<DmnRule> compatibleDmns = dmnExecutionService.findCompatibleDmnsWithAI(formFields);
         return ResponseEntity.ok(compatibleDmns);
     }
+
 }
