@@ -19,6 +19,18 @@ import java.util.stream.Collectors;
 @Service
 public class DmnExecutionService {
 
+    private static final Set<String> CALCULATED_FIELDS = Set.of(
+            "total_actif",
+            "total_passif",
+            "liquidites",
+            "fonds_de_roulement",
+            "bfr",
+            "ratio_endettement",
+            "investissements",
+            "ressources_permanentes",
+            "calculs"
+    );
+
     private final DmnRuleRepository dmnRuleRepository;
     private final DmnEngine dmnEngine;
 
@@ -29,18 +41,6 @@ public class DmnExecutionService {
 
     public List<DmnRule> getAllDmnRules() {
         return dmnRuleRepository.findAll();
-    }
-
-
-    public String evaluateRisk(String ruleKey, double ratioEndettement, double ratioLiquidite, double ratioSolvabilite) {
-        DmnRule rule = dmnRuleRepository.findByRuleKey(ruleKey).orElse(null);
-        if (rule == null) {
-            return "Aucune règle trouvée pour la clé : " + ruleKey;
-        }
-        String dmnXml = rule.getRuleContent();
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(dmnXml.getBytes(StandardCharsets.UTF_8));
-
-        return "Resultat";
     }
 
     public DmnRule importDmn(String ruleKey, MultipartFile file) throws IOException {
@@ -56,48 +56,81 @@ public class DmnExecutionService {
         return dmnRuleRepository.save(dmnRule);
     }
 
-
-
     private Set<String> extractDmnInputs(String dmnContent) {
         Set<String> inputs = new HashSet<>();
-        Pattern pattern = Pattern.compile("<inputExpression[^>]*>\\s*<text>(.*?)</text>\\s*</inputExpression>", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(dmnContent);
-        while (matcher.find()) {
 
-            String input = matcher.group(1).trim().toLowerCase().replace(" ", "_");
+        // Extract direct inputData fields
+        Pattern inputDataPattern = Pattern.compile(
+                "<inputData id=\"[^\"]*\" name=\"([^\"]*)\"",
+                Pattern.DOTALL
+        );
+        Matcher inputDataMatcher = inputDataPattern.matcher(dmnContent);
+        while (inputDataMatcher.find()) {
+            String input = normalizeFieldName(inputDataMatcher.group(1));
             inputs.add(input);
-            System.out.println("Extracted DMN input: " + input);
         }
-        System.out.println("Total extracted DMN inputs: " + inputs);
+
+        // Exclude BKM calculated fields
+        Pattern bkmPattern = Pattern.compile(
+                "<businessKnowledgeModel[^>]*>\\s*<variable name=\"([^\"]*)\"",
+                Pattern.DOTALL
+        );
+        Matcher bkmMatcher = bkmPattern.matcher(dmnContent);
+        if (bkmMatcher.find()) {
+            inputs.remove(normalizeFieldName(bkmMatcher.group(1)));
+        }
+
         return inputs;
     }
 
+    private String normalizeFieldName(String rawName) {
+        return rawName.trim()
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]", "_")
+                .replaceAll("_+", "_");
+    }
 
     public List<DmnRule> findCompatibleDmns(Set<String> formFields) {
-
         Set<String> normalizedFields = formFields.stream()
-                .map(String::toLowerCase)
+                .map(this::normalizeFieldName)
                 .collect(Collectors.toSet());
-        System.out.println("Normalized form fields: " + normalizedFields);
 
         List<DmnRule> allDmns = dmnRuleRepository.findAll();
         List<DmnRule> compatible = new ArrayList<>();
+
         for (DmnRule rule : allDmns) {
             Set<String> dmnInputs = extractDmnInputs(rule.getRuleContent());
-            System.out.println("Checking DMN Rule " + rule.getId() + " with inputs: " + dmnInputs);
+            Set<String> requiredInputs = dmnInputs.stream()
+                    .filter(input -> !isCalculatedField(input))
+                    .collect(Collectors.toSet());
 
-            if (normalizedFields.containsAll(dmnInputs)) {
-                System.out.println("DMN Rule " + rule.getId() + " is compatible");
+            logDebugInfo(rule, dmnInputs, requiredInputs, normalizedFields);
+
+            if (normalizedFields.containsAll(requiredInputs)) {
                 compatible.add(rule);
-            } else {
-
-                Set<String> missingInputs = new HashSet<>(dmnInputs);
-                missingInputs.removeAll(normalizedFields);
-                System.out.println("DMN Rule " + rule.getId() + " is not compatible, missing inputs: " + missingInputs);
             }
         }
-        System.out.println("Total compatible DMN rules found: " + compatible.size());
         return compatible;
     }
 
+    private boolean isCalculatedField(String input) {
+        return CALCULATED_FIELDS.contains(input) || input.endsWith("_calculs");
+    }
+
+    private void logDebugInfo(DmnRule rule, Set<String> dmnInputs, Set<String> requiredInputs, Set<String> formFields) {
+        System.out.printf("Checking DMN Rule %d:%n", rule.getId());
+        System.out.println("Raw DMN Inputs: " + dmnInputs);
+        System.out.println("Required Inputs: " + requiredInputs);
+        System.out.println("Form Fields: " + formFields);
+
+        Set<String> missing = requiredInputs.stream()
+                .filter(f -> !formFields.contains(f))
+                .collect(Collectors.toSet());
+
+        if (!missing.isEmpty()) {
+            System.out.printf("Missing fields for Rule %d: %s%n", rule.getId(), missing);
+        }
+
+        System.out.println("----------------------------------------");
+    }
 }

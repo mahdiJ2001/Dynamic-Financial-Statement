@@ -24,8 +24,8 @@ public class GlobalExceptionHandler {
         String errorMessage = errorMessageService.getErrorMessage(ex.getErrorCode());
 
         Map<String, String> response = new HashMap<>();
-        response.put("errorCode", ex.getErrorCode());  // Ajoutez le code d'erreur
-        response.put("mappedError", errorMessage);     // Message déjà traduit
+        response.put("errorCode", ex.getErrorCode());
+        response.put("mappedError", errorMessage);
 
         System.out.println("Message d'erreur retourné : " + errorMessage);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);

@@ -27,15 +27,6 @@ public class DmnExecutionController {
     }
 
 
-    @GetMapping("/evaluateRisk")
-    public String evaluateRisk(
-            @RequestParam String ruleKey,
-            @RequestParam double ratioEndettement,
-            @RequestParam double ratioLiquidite,
-            @RequestParam double ratioSolvabilite) {
-        return dmnExecutionService.evaluateRisk(ruleKey, ratioEndettement, ratioLiquidite, ratioSolvabilite);
-    }
-
     @PostMapping("/dmn/import")
     public ResponseEntity<?> importDmn(
             @RequestParam("ruleKey") String ruleKey,
