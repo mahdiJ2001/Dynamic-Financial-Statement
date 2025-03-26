@@ -16,6 +16,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,7 +25,7 @@ public class DmnExecutionService {
     private final DmnRuleRepository dmnRuleRepository;
     // API key et endpoint de l'API OpenRouter
     private static final String OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    private static final String OPENROUTER_API_KEY = "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";
+    private static final String OPENROUTER_API_KEY = "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";  // Use provided API key
 
     public DmnExecutionService(DmnRuleRepository dmnRuleRepository) {
         this.dmnRuleRepository = dmnRuleRepository;
@@ -93,7 +94,7 @@ public class DmnExecutionService {
 
         // Construction de la charge utile (payload) en JSON
         String payload = String.format(
-                "{\"model\": \"deepseek/deepseek-r1-zero:free\", \"messages\": [{\"role\": \"user\", \"content\": \"%s\"}]}",
+                "{\"model\": \"deepseek/deepseek-r1-distill-llama-70b:free\", \"messages\": [{\"role\": \"user\", \"content\": \"%s\"}]}",
                 prompt.replace("\"", "\\\"")
         );
 
@@ -140,8 +141,6 @@ public class DmnExecutionService {
         }
     }
 
-
-
     /**
      * Vérifie la compatibilité de chaque DMN par rapport aux formFields (considérés comme JSON)
      * en utilisant l’API AI.
@@ -164,22 +163,40 @@ public class DmnExecutionService {
             throw new RuntimeException("Erreur lors de la conversion des formFields en JSON", e);
         }
 
-        // Pour chaque DMN, on envoie le JSON et le XML à l'API AI
+        // ExecutorService pour l'exécution parallèle des requêtes API
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        List<Callable<Boolean>> tasks = new ArrayList<>();
+
+        // Pour chaque DMN, on crée une tâche qui enverra le JSON et le XML à l'API AI
         for (DmnRule rule : dmnRuleRepository.findAll()) {
-            System.out.println("Processing DMN rule: " + rule.getRuleKey());
-            String xmlContent = rule.getRuleContent();
-            try {
-                boolean isCompatible = isCompatibleWithAI(jsonContent, xmlContent);
-                if (isCompatible) {
-                    compatible.add(rule);
-                    System.out.println("DMN rule " + rule.getRuleKey() + " is compatible according to AI.");
-                } else {
-                    System.out.println("DMN rule " + rule.getRuleKey() + " is not compatible according to AI.");
+            tasks.add(() -> {
+                System.out.println("Processing DMN rule: " + rule.getRuleKey());
+                String xmlContent = rule.getRuleContent();
+                try {
+                    boolean isCompatible = isCompatibleWithAI(jsonContent, xmlContent);
+                    if (isCompatible) {
+                        compatible.add(rule);
+                        System.out.println("DMN rule " + rule.getRuleKey() + " is compatible according to AI.");
+                    } else {
+                        System.out.println("DMN rule " + rule.getRuleKey() + " is not compatible according to AI.");
+                    }
+                } catch (IOException | InterruptedException e) {
+                    System.err.println("Erreur lors de la vérification de la règle " + rule.getRuleKey() + ": " + e.getMessage());
                 }
-            } catch (IOException | InterruptedException e) {
-                System.err.println("Erreur lors de la vérification de la règle " + rule.getRuleKey() + ": " + e.getMessage());
-            }
+                return true;
+            });
         }
+
+        try {
+            // Exécution parallèle des tâches
+            executorService.invokeAll(tasks);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Execution interrupted: " + e.getMessage());
+        } finally {
+            executorService.shutdown();
+        }
+
         System.out.println("Found " + compatible.size() + " compatible DMNs.");
         return compatible;
     }
