@@ -25,7 +25,7 @@ public class DmnExecutionService {
     private final DmnRuleRepository dmnRuleRepository;
     // API key et endpoint de l'API OpenRouter
     private static final String OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    private static final String OPENROUTER_API_KEY = "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";  // Use provided API key
+    private static final String OPENROUTER_API_KEY = "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";  // Utilise ta clé API
 
     public DmnExecutionService(DmnRuleRepository dmnRuleRepository) {
         this.dmnRuleRepository = dmnRuleRepository;
