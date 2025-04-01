@@ -25,7 +25,7 @@ public class DmnExecutionService {
     private final DmnRuleRepository dmnRuleRepository;
     // API key et endpoint de l'API OpenRouter
     private static final String OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    private static final String OPENROUTER_API_KEY = "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";  // Use provided API key
+    private static final String OPENROUTER_API_KEY = "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";  // Utilise ta clé API
 
     public DmnExecutionService(DmnRuleRepository dmnRuleRepository) {
         this.dmnRuleRepository = dmnRuleRepository;
@@ -78,11 +78,12 @@ public class DmnExecutionService {
                 " - Accented characters (e.g., \"é\") can be replaced by their non-accented equivalent (\"e\").\n" +
                 " - Matching is case-insensitive (e.g., \"Logiciels\" = \"logiciels\").\n" +
                 " - Extra fields in the JSON should be ignored.\n\n" +
-                "Please determine whether the following DMN and JSON are compatible. Your response must be exactly one single digit: 1 if compatible, 0 if not.\n\n" +
+                "Please determine whether the following DMN and JSON are compatible. Your response must be exactly one single digit: 1 if compatible, 0 if not. Answer very briefly (only a digit, no explanation).\n\n" +
                 "This is the JSON: %s\n" +
                 "This is the XML: %s";
         return String.format(promptTemplate, jsonContent, xmlContent);
     }
+
 
     /**
      * Appel à l'API OpenRouter pour vérifier la compatibilité.

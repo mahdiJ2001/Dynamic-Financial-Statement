@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "regles_dmn")
 @Data
@@ -21,4 +23,14 @@ public class DmnRule {
 
     @Column(name = "rule_content", columnDefinition = "text", nullable = false)
     private String ruleContent;
+
+    // New createdAt field to store the creation timestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    // Automatically set the createdAt field before persisting the entity
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();  // Set the current date and time when the entity is created
+    }
 }

@@ -46,10 +46,18 @@ public class DmnExecutionController {
     }
 
     @GetMapping("/dmn/compatible")
+    public ResponseEntity<List<DmnRule>> getAllDmns() {
+        List<DmnRule> allDmns = dmnExecutionService.getAllDmnRules();
+        return ResponseEntity.ok(allDmns);
+    }
+
+    /*
+    @GetMapping("/dmn/compatible")
     public ResponseEntity<?> getCompatibleDmns(@RequestParam("fields") String fields) {
         Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));
         List<DmnRule> compatibleDmns = dmnExecutionService.findCompatibleDmnsWithAI(formFields);
         return ResponseEntity.ok(compatibleDmns);
     }
+    */
 
 }
