@@ -1,7 +1,9 @@
 package com.pfe.DFinancialStatement.dmn_rule.controller;
 
 import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
-import com.pfe.DFinancialStatement.dmn_rule.service.DmnExecutionService;
+import com.pfe.DFinancialStatement.dmn_rule.service.DmnRuleImportService;
+import com.pfe.DFinancialStatement.dmn_rule.service.DmnRuleAICompatibilityService;
+import com.pfe.DFinancialStatement.dmn_rule.service.DmnRuleStaticCompatibilityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,26 +15,31 @@ import java.util.*;
 @RestController
 public class DmnExecutionController {
 
-    private final DmnExecutionService dmnExecutionService;
+    private final DmnRuleImportService dmnRuleImportService;
+    private final DmnRuleAICompatibilityService dmnRuleAICompatibilityService;
+    private final DmnRuleStaticCompatibilityService dmnRuleStaticCompatibilityService;
 
     @Autowired
-    public DmnExecutionController(DmnExecutionService dmnExecutionService) {
-        this.dmnExecutionService = dmnExecutionService;
+    public DmnExecutionController(DmnRuleImportService dmnRuleImportService,
+                                  DmnRuleAICompatibilityService dmnRuleAICompatibilityService,
+                                  DmnRuleStaticCompatibilityService dmnRuleStaticCompatibilityService) {
+        this.dmnRuleImportService = dmnRuleImportService;
+        this.dmnRuleAICompatibilityService = dmnRuleAICompatibilityService;
+        this.dmnRuleStaticCompatibilityService = dmnRuleStaticCompatibilityService;
     }
 
     @GetMapping("/dmn")
     public ResponseEntity<List<DmnRule>> getAllDmnRules() {
-        List<DmnRule> dmnRules = dmnExecutionService.getAllDmnRules();
+        List<DmnRule> dmnRules = dmnRuleImportService.getAllDmnRules();
         return ResponseEntity.ok(dmnRules);
     }
-
 
     @PostMapping("/dmn/import")
     public ResponseEntity<?> importDmn(
             @RequestParam("ruleKey") String ruleKey,
             @RequestParam("file") MultipartFile file) {
         try {
-            DmnRule rule = dmnExecutionService.importDmn(ruleKey, file);
+            DmnRule rule = dmnRuleImportService.importDmn(ruleKey, file);
             Map<String, Object> response = new HashMap<>();
             response.put("message", "DMN importé avec succès");
             response.put("ruleKey", rule.getRuleKey());
@@ -45,19 +52,19 @@ public class DmnExecutionController {
         }
     }
 
-    @GetMapping("/dmn/compatible")
-    public ResponseEntity<List<DmnRule>> getAllDmns() {
-        List<DmnRule> allDmns = dmnExecutionService.getAllDmnRules();
-        return ResponseEntity.ok(allDmns);
-    }
-
-    /*
-    @GetMapping("/dmn/compatible")
-    public ResponseEntity<?> getCompatibleDmns(@RequestParam("fields") String fields) {
+    // Uncomment the endpoint below to use the AI-based compatibility service.
+    @GetMapping("/dmn/compatible/ai")
+    public ResponseEntity<List<DmnRule>> getCompatibleDmnsAI(@RequestParam("fields") String fields) {
         Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));
-        List<DmnRule> compatibleDmns = dmnExecutionService.findCompatibleDmnsWithAI(formFields);
+        List<DmnRule> compatibleDmns = dmnRuleAICompatibilityService.findCompatibleDmnsWithAI(formFields);
         return ResponseEntity.ok(compatibleDmns);
     }
-    */
 
+    // Static compatibility endpoint
+    @GetMapping("/dmn/compatible/static")
+    public ResponseEntity<List<DmnRule>> getCompatibleDmnsStatic(@RequestParam("fields") String fields) {
+        Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));
+        List<DmnRule> compatibleDmns = dmnRuleStaticCompatibilityService.findCompatibleDmns(formFields);
+        return ResponseEntity.ok(compatibleDmns);
+    }
 }

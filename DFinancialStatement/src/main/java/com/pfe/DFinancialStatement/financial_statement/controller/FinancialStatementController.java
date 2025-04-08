@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -29,12 +30,15 @@ public class FinancialStatementController {
     }
 
     @PostMapping
-    public ResponseEntity<String> evaluateAndSaveFinancialStatement(
+    public ResponseEntity<Map<String, Object>> evaluateAndSaveFinancialStatement(
             @RequestBody FinancialStatementDTO financialStatementDTO,
             @RequestParam String ruleKey) {
 
-        String result = financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey);
+        // Get the result from the service
+        Map<String, Object> result = financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey);
 
+        // Return a structured JSON response
         return ResponseEntity.ok(result);
     }
+
 }

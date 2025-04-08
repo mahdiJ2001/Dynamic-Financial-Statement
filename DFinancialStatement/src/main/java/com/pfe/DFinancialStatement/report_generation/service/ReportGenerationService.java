@@ -47,17 +47,12 @@ public class ReportGenerationService {
         // Fill the report with data
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 
-        // Define the target path for the PDF file
-        Path targetPath = Paths.get("src/main/resources/reports/FinancialReport.pdf");
-
         // Export the report to a byte array
         byte[] pdfBytes = JasperExportManager.exportReportToPdf(jasperPrint);
 
-        // Optionally, save the file to resources (if needed)
-        JasperExportManager.exportReportToPdfFile(jasperPrint, targetPath.toString());
-
         return pdfBytes;
     }
+
 
     private Root convertJsonToRoot(Map<String, Object> inputJson) {
         // Extract "actif" and "passif" lists from the incoming JSON
