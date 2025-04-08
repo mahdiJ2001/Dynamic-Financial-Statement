@@ -38,7 +38,7 @@ public class ReportController {
             return ResponseEntity.ok().headers(headers).body(pdfBytes);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).build();
+            return ResponseEntity.status(500).body("Error generating the report".getBytes());
         }
     }
 }

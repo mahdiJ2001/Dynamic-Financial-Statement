@@ -6,6 +6,6 @@ import java.time.LocalDateTime;
 @Data
 public class FinancialStatementDTO {
     private String formData;
-    private String analysisResult;
+    private byte[] report;
     private LocalDateTime createdAt;
 }

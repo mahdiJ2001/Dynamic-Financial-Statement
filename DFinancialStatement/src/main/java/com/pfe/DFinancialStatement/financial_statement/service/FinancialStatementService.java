@@ -7,6 +7,7 @@ import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatement
 import com.pfe.DFinancialStatement.financial_statement.mapper.FinancialStatementMapper;
 import com.pfe.DFinancialStatement.financial_statement.repository.FinancialStatementRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfe.DFinancialStatement.report_generation.service.ReportGenerationService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,11 @@ public class FinancialStatementService {
     @Autowired
     private ObjectMapper objectMapper; // For JSON parsing
 
-    public String evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey) {
+    @Autowired
+    private ReportGenerationService reportGenerationService;
+
+
+    public Map<String, Object> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey) {
         try {
             // Convert JSON string to Map
             Map<String, Object> rawData = objectMapper.readValue(dto.getFormData(), Map.class);
@@ -48,30 +53,45 @@ public class FinancialStatementService {
             // Evaluate DMN rule
             String dmnResultJson = dmnEvaluationService.evaluateDmn(ruleKey, inputData);
 
-            // Parse decision result from DMN evaluation
+            // Parse decision result
             JSONObject jsonResult = new JSONObject(dmnResultJson);
             String decisionMessage = jsonResult.optString("decision", "Decision processed successfully").trim();
             String exceptionMessage = jsonResult.optString("exception", null);
 
-            // Check if there is an exception from DMN
             if (exceptionMessage != null && !exceptionMessage.trim().isEmpty() && !"null".equals(exceptionMessage.trim())) {
                 throw new CustomException(exceptionMessage);
             }
 
-            // Log the DMN decision message (result)
-            logger.info("DMN decision message: {}", decisionMessage);
+            byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, "Company Name");
 
-            // Save the financial statement
+            // Map DTO to entity and attach the report
             FinancialStatement entity = financialStatementMapper.toEntity(dto);
+            entity.setReport(reportPdf);
             entity.setCreatedAt(LocalDateTime.now());
-            financialStatementRepository.save(entity);
 
-            return "Financial statement evaluated and saved successfully. Result: " + decisionMessage;
-        }
-        catch (Exception e) {
+            // Call saveFinancialStatement method to save the financial statement
+            saveFinancialStatement(dto.getFormData(), reportPdf); // Save the formData and report
+
+            // Return result as JSON object
+            Map<String, Object> result = new HashMap<>();
+            result.put("status", "success");
+            result.put("message", "Financial statement evaluated and saved successfully.");
+            result.put("result", decisionMessage);
+
+            return result;
+        } catch (Exception e) {
             throw new CustomException(e.getMessage());
         }
     }
+
+    public void saveFinancialStatement(String formData, byte[] reportBytes) {
+        FinancialStatement statement = new FinancialStatement();
+        statement.setFormData(formData);
+        statement.setReport(reportBytes);
+        financialStatementRepository.save(statement);  // This saves the statement in the DB
+    }
+
+
 
     // Helper method to extract fields from 'actif' or 'passif'
     private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {

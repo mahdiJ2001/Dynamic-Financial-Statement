@@ -4,58 +4,29 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
 import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
-import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Service
-public class DmnExecutionService {
+public class DmnRuleAICompatibilityService {
 
     private final DmnRuleRepository dmnRuleRepository;
-    // API key et endpoint de l'API OpenRouter
     private static final String OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
     private static final String OPENROUTER_API_KEY = "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";  // Utilise ta clé API
 
-    public DmnExecutionService(DmnRuleRepository dmnRuleRepository) {
+    public DmnRuleAICompatibilityService(DmnRuleRepository dmnRuleRepository) {
         this.dmnRuleRepository = dmnRuleRepository;
     }
 
-    public List<DmnRule> getAllDmnRules() {
-        System.out.println("Fetching all DMN rules...");
-        return dmnRuleRepository.findAll();
-    }
-
-    public DmnRule importDmn(String ruleKey, MultipartFile file) throws IOException {
-        System.out.println("Importing DMN rule with key: " + ruleKey);
-
-        if (dmnRuleRepository.findByRuleKey(ruleKey).isPresent()) {
-            throw new CustomException("RULE_KEY_EXISTS");
-        }
-
-        String content = new String(file.getBytes(), StandardCharsets.UTF_8);
-        DmnRule dmnRule = new DmnRule();
-        dmnRule.setRuleKey(ruleKey);
-        dmnRule.setRuleContent(content);
-
-        System.out.println("DMN rule imported successfully: " + ruleKey);
-        return dmnRuleRepository.save(dmnRule);
-    }
-
-    /**
-     * Normalise un nom de champ en enlevant les accents, en convertissant en minuscules
-     * et en remplaçant les caractères non alphanumériques par des underscores.
-     */
     private String normalizeFieldName(String rawName) {
         String withoutAccents = Normalizer.normalize(rawName, Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
@@ -68,10 +39,6 @@ public class DmnExecutionService {
         return normalizedName;
     }
 
-    /**
-     * Construit dynamiquement le prompt à envoyer à l'API AI en injectant les contenus JSON et XML.
-     * Le prompt spécifie explicitement que la réponse doit être exactement un seul digit ("1" ou "0").
-     */
     private String buildPrompt(String jsonContent, String xmlContent) {
         String promptTemplate = "A DMN and a JSON are considered compatible if and only if all input labels required by the DMN XML are present inside the JSON, considering normalization. Normalization rules include:\n\n" +
                 " - Spaces (\" \") can be replaced by underscores (\"_\").\n" +
@@ -84,12 +51,6 @@ public class DmnExecutionService {
         return String.format(promptTemplate, jsonContent, xmlContent);
     }
 
-
-    /**
-     * Appel à l'API OpenRouter pour vérifier la compatibilité.
-     * Retourne true si compatible, false sinon.
-     * La méthode réessaie l'appel si la réponse n'est pas exactement un seul digit ("1" ou "0").
-     */
     private boolean isCompatibleWithAI(String jsonContent, String xmlContent) throws IOException, InterruptedException {
         String prompt = buildPrompt(jsonContent, xmlContent);
 
@@ -122,12 +83,10 @@ public class DmnExecutionService {
                     .trim();
             System.out.println("Réponse extraite de l'AI : " + answer);
 
-            // Si la réponse est exactement "1" ou "0", on la renvoie directement
             if ("1".equals(answer) || "0".equals(answer)) {
                 return "1".equals(answer);
             }
 
-            // Sinon, tenter d'extraire un digit isolé avec une expression régulière
             java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("\\b([01])\\b");
             java.util.regex.Matcher matcher = pattern.matcher(answer);
             if (matcher.find()) {
@@ -142,10 +101,6 @@ public class DmnExecutionService {
         }
     }
 
-    /**
-     * Vérifie la compatibilité de chaque DMN par rapport aux formFields (considérés comme JSON)
-     * en utilisant l’API AI.
-     */
     public List<DmnRule> findCompatibleDmnsWithAI(Set<String> formFields) {
         System.out.println("Finding compatible DMNs using AI...");
         List<DmnRule> compatible = new ArrayList<>();

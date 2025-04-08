@@ -18,10 +18,11 @@ public class FinancialStatement {
     private Long id;
 
     @Column(name = "form_data", columnDefinition = "TEXT")
-    private String formData;  // Form data stored as String (JSON)
+    private String formData;
 
-    @Column(name = "analysis_result", columnDefinition = "TEXT")
-    private String analysisResult; // Analysis result stored as String (JSON)
+    @Lob
+    @Column(name = "report")
+    private byte[] report;
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
