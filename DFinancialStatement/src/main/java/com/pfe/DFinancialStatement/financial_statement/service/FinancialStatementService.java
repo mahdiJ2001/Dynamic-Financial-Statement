@@ -41,7 +41,7 @@ public class FinancialStatementService {
     private ReportGenerationService reportGenerationService;
 
 
-    public Map<String, Object> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey) {
+    public Map<String, Object> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey,String designName) {
         try {
             // Convert JSON string to Map
             Map<String, Object> rawData = objectMapper.readValue(dto.getFormData(), Map.class);
@@ -62,7 +62,7 @@ public class FinancialStatementService {
                 throw new CustomException(exceptionMessage);
             }
 
-            byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, "Company Name");
+            byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, "Company Name",designName);
 
             // Map DTO to entity and attach the report
             FinancialStatement entity = financialStatementMapper.toEntity(dto);

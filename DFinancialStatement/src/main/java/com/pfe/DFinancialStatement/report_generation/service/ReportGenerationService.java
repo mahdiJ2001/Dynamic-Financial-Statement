@@ -16,14 +16,15 @@ import java.util.*;
 @Service
 public class ReportGenerationService {
 
-    public byte[] generateFinancialReport(Map<String, Object> inputJson, String companyName) throws Exception {
+    public byte[] generateFinancialReport(Map<String, Object> inputJson, String companyName, String designName) throws Exception {
         // Convert the JSON input to Root structure
         Root root = convertJsonToRoot(inputJson);
 
-        // Load the JRXML report from resources
-        InputStream reportStream = this.getClass().getResourceAsStream("/Designed.jrxml");
+        // Dynamically load the JRXML report based on the provided design name
+        String jrxmlPath = "/" + designName + ".jrxml";
+        InputStream reportStream = this.getClass().getResourceAsStream(jrxmlPath);
         if (reportStream == null) {
-            throw new IllegalArgumentException("'Designed.jrxml' not found in resources.");
+            throw new IllegalArgumentException("'" + jrxmlPath + "' not found in resources.");
         }
         JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
 
@@ -52,6 +53,7 @@ public class ReportGenerationService {
 
         return pdfBytes;
     }
+
 
 
     private Root convertJsonToRoot(Map<String, Object> inputJson) {

@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BilanFinancier" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="4701b8c4-915d-4483-92c9-59ca45b3711e">
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="JsonDataAdapter.xml.jrdax"/>
+    <property name="com.jaspersoft.studio.unit." value="pixel"/>
+    <style name="Title" forecolor="#0066CC" fontName="DejaVu Sans" fontSize="20" isBold="true" pdfFontName="Helvetica-Bold"/>
+    <style name="SectionHeader" forecolor="#333333" backcolor="#F0F0F0" fontName="DejaVu Sans" fontSize="12" isBold="true" pdfFontName="Helvetica-Bold">
+        <box>
+            <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+        </box>
+        <paragraph leftIndent="5"/>
+    </style>
+    <style name="Total" forecolor="#0066CC" fontName="DejaVu Sans" fontSize="12" isBold="true" pdfFontName="Helvetica-Bold"/>
+    <style name="Label" fontName="DejaVu Sans" fontSize="10" pdfFontName="Helvetica">
+        <box>
+            <bottomPen lineWidth="0.5" lineStyle="Dotted" lineColor="#CCCCCC"/>
+        </box>
+        <paragraph leftIndent="5"/>
+    </style>
+    <style name="Value" fontName="DejaVu Sans" fontSize="10" pdfFontName="Helvetica">
+        <box>
+            <bottomPen lineWidth="0.5" lineStyle="Dotted" lineColor="#CCCCCC"/>
+        </box>
+        <paragraph rightIndent="5"/>
+    </style>
+    <style name="CategoryHeader" mode="Opaque" forecolor="#FFFFFF" backcolor="#0066CC" fontName="DejaVu Sans" fontSize="12" isBold="true" pdfFontName="Helvetica-Bold">
+        <box>
+            <pen lineWidth="0.5" lineColor="#000000"/>
+        </box>
+        <paragraph leftIndent="5" spacingBefore="3" spacingAfter="3"/>
+    </style>
+    <style name="SignatureBlock" fontName="DejaVu Sans" fontSize="10" pdfFontName="Helvetica">
+        <box>
+            <topPen lineWidth="1.0" lineStyle="Solid" lineColor="#CCCCCC"/>
+        </box>
+        <paragraph leftIndent="5" spacingBefore="30"/>
+    </style>
+    <subDataset name="ActifDataset" uuid="0b543b91-3eb0-4ac3-9f8e-983f22ed77e2">
+        <field name="name" class="java.lang.String"/>
+        <field name="fields" class="java.util.Collection"/>
+    </subDataset>
+    <subDataset name="PassifDataset" uuid="7d3d328a-9dc7-4f1b-a1de-fb69b464023e">
+        <field name="name" class="java.lang.String"/>
+        <field name="fields" class="java.util.Collection"/>
+    </subDataset>
+    <subDataset name="FieldsDataset" uuid="fc8f19cd-84d4-4387-b2b5-7bddd4d1d1a8">
+        <field name="label" class="java.lang.String"/>
+        <field name="value" class="java.lang.Number"/>
+    </subDataset>
+    <parameter name="COMPANY_NAME" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA["Entreprise XYZ"]]></defaultValueExpression>
+    </parameter>
+    <parameter name="REPORT_DATE" class="java.lang.String" isForPrompting="false">
+        <defaultValueExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())]]></defaultValueExpression>
+    </parameter>
+    <parameter name="LOGO" class="java.awt.Image" isForPrompting="false"/>
+    <field name="actif" class="java.util.Collection"/>
+    <field name="passif" class="java.util.Collection"/>
+    <variable name="TOTAL_ACTIF" class="java.lang.Double">
+        <variableExpression><![CDATA[((Collection)$F{actif}).stream()
+      .mapToDouble(actifItem -> {
+          com.pfe.DFinancialStatement.report_generation.json_structure.Actif a = (com.pfe.DFinancialStatement.report_generation.json_structure.Actif)actifItem;
+          return a.getFields().stream()
+                    .mapToDouble(field -> field.getValue())
+                    .sum();
+      })
+      .sum()]]></variableExpression>
+        <initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+    </variable>
+    <variable name="TOTAL_PASSIF" class="java.lang.Double">
+        <variableExpression><![CDATA[((Collection)$F{passif}).stream()
+      .mapToDouble(passifItem -> {
+          com.pfe.DFinancialStatement.report_generation.json_structure.Passif p = (com.pfe.DFinancialStatement.report_generation.json_structure.Passif)passifItem;
+          return p.getFields().stream()
+                    .mapToDouble(field -> field.getValue())
+                    .sum();
+      })
+      .sum()]]></variableExpression>
+        <initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+    </variable>
+    <background>
+        <band height="802" splitType="Stretch">
+            <rectangle>
+                <reportElement mode="Transparent" x="0" y="0" width="535" height="802" backcolor="#FFFFFF" uuid="45c569c2-4a27-4af3-b59a-3bb73e6cd70e"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                </graphicElement>
+            </rectangle>
+        </band>
+    </background>
+    <title>
+        <band height="100" splitType="Stretch">
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="535" height="90" backcolor="#F8F8F8" uuid="5957cbf8-ce7a-4bdd-acd1-6d42ff80d344"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                </graphicElement>
+            </rectangle>
+            <image>
+                <reportElement x="10" y="10" width="70" height="70" uuid="e81cc0e1-41b1-4e15-ac97-48a8b7672b83">
+                    <printWhenExpression><![CDATA[$P{LOGO} != null]]></printWhenExpression>
+                </reportElement>
+                <imageExpression><![CDATA[$P{LOGO}]]></imageExpression>
+            </image>
+            <textField>
+                <reportElement style="Title" x="90" y="20" width="435" height="30" forecolor="#333333" uuid="e81cc0e1-41b1-4e15-ac97-48a8b7672b82"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{COMPANY_NAME} + " - BILAN FINANCIER"]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="80" y="50" width="435" height="20" forecolor="#666666" uuid="4f338e0f-a2ee-4d0e-92d5-9fa7ae8b485a"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="12" isItalic="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Établi au " + $P{REPORT_DATE}]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+    <pageHeader>
+        <band height="20" splitType="Stretch"/>
+    </pageHeader>
+    <detail>
+        <band height="30" splitType="Stretch">
+            <printWhenExpression><![CDATA[Boolean.TRUE]]></printWhenExpression>
+            <staticText>
+                <reportElement style="CategoryHeader" x="0" y="5" width="267" height="25" backcolor="#1976D2" uuid="2544b3f3-af22-45a5-85fd-c4fe2552d856">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                </reportElement>
+                <box>
+                    <pen lineWidth="0.5"/>
+                    <topPen lineWidth="0.5"/>
+                    <leftPen lineWidth="0.5"/>
+                    <bottomPen lineWidth="0.5"/>
+                    <rightPen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" isBold="true"/>
+                </textElement>
+                <text><![CDATA[ACTIF]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="CategoryHeader" x="267" y="5" width="267" height="25" backcolor="#1976D2" uuid="fb491629-305f-428f-9bc8-f6746e3bbd52">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                    <property name="com.jaspersoft.studio.unit.x" value="px"/>
+                </reportElement>
+                <box>
+                    <pen lineWidth="0.5"/>
+                    <topPen lineWidth="0.5"/>
+                    <leftPen lineWidth="0.5"/>
+                    <bottomPen lineWidth="0.5"/>
+                    <rightPen lineWidth="0.5"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" isBold="true"/>
+                </textElement>
+                <text><![CDATA[PASSIF]]></text>
+            </staticText>
+        </band>
+        <band height="250" splitType="Stretch">
+            <componentElement>
+                <reportElement stretchType="ElementGroupHeight" x="0" y="0" width="267" height="250" uuid="b4781d44-67c6-4b0d-abe9-1a1d0073e123"/>
+                <jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+                    <datasetRun subDataset="ActifDataset" uuid="fcd06dc9-7dcc-4059-83da-047d8de200fb">
+                        <dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource((Collection)$F{actif})]]></dataSourceExpression>
+                    </datasetRun>
+                    <jr:listContents height="45" width="267">
+                        <rectangle>
+                            <reportElement mode="Opaque" x="0" y="0" width="267" height="25" backcolor="#F0F0F0" uuid="79e45467-4a15-472a-8fcb-f2e3187e9e63"/>
+                            <graphicElement>
+                                <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                            </graphicElement>
+                        </rectangle>
+                        <textField>
+                            <reportElement style="SectionHeader" x="0" y="0" width="267" height="25" uuid="79e45467-4a15-472a-8fcb-f2e3187e9e63"/>
+                            <box>
+                                <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                            </box>
+                            <textElement textAlignment="Left" verticalAlignment="Middle">
+                                <font fontName="Arial"/>
+                            </textElement>
+                            <textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+                        </textField>
+                        <componentElement>
+                            <reportElement stretchType="ContainerHeight" x="0" y="25" width="267" height="20" uuid="f15ff8dc-c407-4791-8b91-c3677d99d033"/>
+                            <jr:list printOrder="Vertical">
+                                <datasetRun subDataset="FieldsDataset" uuid="865f058b-8bb0-4cda-a793-969bb721bbea">
+                                    <dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource((Collection)$F{fields})]]></dataSourceExpression>
+                                </datasetRun>
+                                <jr:listContents height="20" width="267">
+                                    <textField>
+                                        <reportElement style="Label" x="0" y="0" width="167" height="20" uuid="273ff5d0-2d19-4504-acfe-d345246b95b0"/>
+                                        <box>
+                                            <pen lineWidth="0.0"/>
+                                            <topPen lineWidth="0.0"/>
+                                            <leftPen lineWidth="0.5" lineColor="#CCCCCC"/>
+                                            <bottomPen lineWidth="0.5" lineStyle="Dotted" lineColor="#CCCCCC"/>
+                                            <rightPen lineWidth="0.0"/>
+                                        </box>
+                                        <textElement verticalAlignment="Middle">
+                                            <font fontName="Arial"/>
+                                        </textElement>
+                                        <textFieldExpression><![CDATA[$F{label}]]></textFieldExpression>
+                                    </textField>
+                                    <textField pattern="#,##0.00 €">
+                                        <reportElement style="Value" x="167" y="0" width="100" height="20" uuid="11b5f85f-112e-4210-8d3a-69bbe5521764"/>
+                                        <box>
+                                            <pen lineWidth="0.0"/>
+                                            <topPen lineWidth="0.0"/>
+                                            <leftPen lineWidth="0.0"/>
+                                            <bottomPen lineWidth="0.5" lineStyle="Dotted" lineColor="#CCCCCC"/>
+                                            <rightPen lineWidth="0.5" lineColor="#CCCCCC"/>
+                                        </box>
+                                        <textElement textAlignment="Right" verticalAlignment="Middle">
+                                            <font fontName="Arial"/>
+                                        </textElement>
+                                        <textFieldExpression><![CDATA[$F{value}]]></textFieldExpression>
+                                    </textField>
+                                </jr:listContents>
+                            </jr:list>
+                        </componentElement>
+                    </jr:listContents>
+                </jr:list>
+            </componentElement>
+            <componentElement>
+                <reportElement stretchType="ElementGroupHeight" x="268" y="0" width="267" height="250" uuid="e9640638-969d-4b9e-abbb-d662eb42e709">
+                    <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                </reportElement>
+                <jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+                    <datasetRun subDataset="PassifDataset" uuid="d5ab3e72-c9fc-4d9b-b926-e113b6308913">
+                        <dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource((Collection)$F{passif})]]></dataSourceExpression>
+                    </datasetRun>
+                    <jr:listContents height="45" width="267">
+                        <rectangle>
+                            <reportElement mode="Opaque" x="0" y="0" width="267" height="25" backcolor="#F0F0F0" uuid="01adedf6-aaaf-4ff2-9b4c-f0af780fc2f4"/>
+                            <graphicElement>
+                                <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                            </graphicElement>
+                        </rectangle>
+                        <textField>
+                            <reportElement style="SectionHeader" x="0" y="0" width="267" height="25" uuid="01adedf6-aaaf-4ff2-9b4c-f0af780fc2f4"/>
+                            <box>
+                                <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                            </box>
+                            <textElement textAlignment="Left" verticalAlignment="Middle">
+                                <font fontName="Arial"/>
+                            </textElement>
+                            <textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+                        </textField>
+                        <componentElement>
+                            <reportElement stretchType="ContainerHeight" x="0" y="25" width="267" height="20" uuid="303cec42-fd73-4130-9d9e-d0170b77b0d2"/>
+                            <jr:list printOrder="Vertical">
+                                <datasetRun subDataset="FieldsDataset" uuid="c88884c8-ead3-4aad-b2b3-b7e31f870161">
+                                    <dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource((Collection)$F{fields})]]></dataSourceExpression>
+                                </datasetRun>
+                                <jr:listContents height="20" width="267">
+                                    <textField>
+                                        <reportElement style="Label" x="0" y="0" width="167" height="20" uuid="67a6e44c-d25a-46ae-9981-b2fb337a38f5"/>
+                                        <box>
+                                            <pen lineWidth="0.0"/>
+                                            <topPen lineWidth="0.0"/>
+                                            <leftPen lineWidth="0.5" lineColor="#CCCCCC"/>
+                                            <bottomPen lineWidth="0.5" lineStyle="Dotted" lineColor="#CCCCCC"/>
+                                            <rightPen lineWidth="0.0"/>
+                                        </box>
+                                        <textElement verticalAlignment="Middle">
+                                            <font fontName="Arial"/>
+                                        </textElement>
+                                        <textFieldExpression><![CDATA[$F{label}]]></textFieldExpression>
+                                    </textField>
+                                    <textField pattern="#,##0.00 €">
+                                        <reportElement style="Value" x="167" y="0" width="100" height="20" uuid="580fa349-5888-42cf-8b64-da7c7904dc4b"/>
+                                        <box>
+                                            <pen lineWidth="0.0"/>
+                                            <topPen lineWidth="0.0"/>
+                                            <leftPen lineWidth="0.0"/>
+                                            <bottomPen lineWidth="0.5" lineStyle="Dotted" lineColor="#CCCCCC"/>
+                                            <rightPen lineWidth="0.5" lineColor="#CCCCCC"/>
+                                        </box>
+                                        <textElement textAlignment="Right" verticalAlignment="Middle">
+                                            <font fontName="Arial"/>
+                                        </textElement>
+                                        <textFieldExpression><![CDATA[$F{value}]]></textFieldExpression>
+                                    </textField>
+                                </jr:listContents>
+                            </jr:list>
+                        </componentElement>
+                    </jr:listContents>
+                </jr:list>
+            </componentElement>
+            <line>
+                <reportElement x="267" y="0" width="1" height="250" forecolor="#FFFFFF" uuid="e0cebd47-762c-4050-b31b-d63f5a116540"/>
+                <graphicElement>
+                    <pen lineWidth="1.0"/>
+                </graphicElement>
+            </line>
+        </band>
+    </detail>
+    <pageFooter>
+        <band height="90" splitType="Stretch">
+            <!-- Signature blocks in page footer -->
+            <rectangle>
+                <reportElement x="0" y="0" width="267" height="60" uuid="8f800b5c-aa2f-4dd8-a4d2-af33f27c9478"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="CategoryHeader" mode="Transparent" x="0" y="0" width="267" height="20" forecolor="#333333" uuid="8f800b5c-aa2f-4dd8-a4d2-af33f27c9478"/>
+                <box>
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.5" lineColor="#CCCCCC"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="10" isBold="true" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Signature du comptable :]]></text>
+            </staticText>
+            <rectangle>
+                <reportElement x="268" y="0" width="267" height="60" uuid="7761324e-5934-498c-bfb8-356aacab2053"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="CategoryHeader" mode="Transparent" x="268" y="0" width="267" height="20" forecolor="#333333" backcolor="#FFFFFF" uuid="7761324e-5934-498c-bfb8-356aacab2053"/>
+                <box>
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.5" lineColor="#CCCCCC"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="10" isBold="true" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Signature du dirigeant :]]></text>
+            </staticText>
+            <!-- Page number info -->
+            <textField>
+                <reportElement x="0" y="70" width="535" height="20" forecolor="#666666" uuid="8d44e7e5-2d7a-4b88-ba28-c21753a85a8e"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$P{COMPANY_NAME} + " - Bilan Financier - Page " + $V{PAGE_NUMBER} + " / " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+        </band>
+    </pageFooter>
+    <summary>
+        <band height="70" splitType="Stretch">
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="10" width="535" height="40" backcolor="#F8F8F8" uuid="8a6fb28f-7194-494f-a4d8-8a8d130ccaee"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                </graphicElement>
+            </rectangle>
+            <line>
+                <reportElement x="267" y="10" width="1" height="40" forecolor="#CCCCCC" uuid="b5d5c48b-c0ca-4cb9-83ac-39a9e6e69cde"/>
+                <graphicElement>
+                    <pen lineWidth="1.0"/>
+                </graphicElement>
+            </line>
+            <staticText>
+                <reportElement style="Total" x="10" y="20" width="157" height="20" forecolor="#000305" uuid="5c27c82b-cb19-4b7a-ad1c-6ce957c53fe3"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font fontName="Arial" isBold="true"/>
+                </textElement>
+                <text><![CDATA[TOTAL ACTIF:]]></text>
+            </staticText>
+            <textField pattern="#,##0.00 €">
+                <reportElement style="Total" x="160" y="20" width="100" height="20" forecolor="#000305" uuid="0f1e74a3-1774-423c-93bf-79a265cdf1f1"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="Arial" isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{TOTAL_ACTIF}]]></textFieldExpression>
+            </textField>
+            <staticText>
+                <reportElement style="Total" x="278" y="20" width="157" height="20" forecolor="#000305" uuid="5332cc37-d113-457e-b155-04d43e655847"/>
+                <textElement textAlignment="Left" verticalAlignment="Middle">
+                    <font fontName="Arial" isBold="true"/>
+                </textElement>
+                <text><![CDATA[TOTAL PASSIF:]]></text>
+            </staticText>
+            <textField pattern="#,##0.00 €">
+                <reportElement style="Total" x="425" y="20" width="100" height="20" forecolor="#000305" uuid="864d5bb9-0699-4b56-b5ab-e69c8848f061"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="Arial" isBold="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{TOTAL_PASSIF}]]></textFieldExpression>
+            </textField>
+        </band>
+    </summary>
+    <noData>
+        <band height="100">
+            <staticText>
+                <reportElement x="0" y="30" width="535" height="30" uuid="9d58f9d9-7b5b-4b15-af13-44be529b3bf4"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="12" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Aucune donnée disponible pour ce bilan financier.]]></text>
+            </staticText>
+        </band>
+    </noData>
+</jasperReport>

@@ -32,10 +32,11 @@ public class FinancialStatementController {
     @PostMapping
     public ResponseEntity<Map<String, Object>> evaluateAndSaveFinancialStatement(
             @RequestBody FinancialStatementDTO financialStatementDTO,
-            @RequestParam String ruleKey) {
+            @RequestParam String ruleKey,
+            @RequestParam String designName) {
 
         // Get the result from the service
-        Map<String, Object> result = financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey);
+        Map<String, Object> result = financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey, designName);
 
         // Return a structured JSON response
         return ResponseEntity.ok(result);
