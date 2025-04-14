@@ -22,13 +22,14 @@ public class ReportController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<byte[]> generateFinancialReport(@RequestBody Map<String, Object> inputJson) {
+    public ResponseEntity<byte[]> generateFinancialReport(@RequestBody Map<String, Object> inputJson,
+                                                          @RequestParam String designName) {
         try {
             // Extract company name from inputJson
             String companyName = (String) inputJson.get("companyName");
 
-            // Pass company name along with other parameters to the service
-            byte[] pdfBytes = reportGenerationService.generateFinancialReport(inputJson, companyName);
+            // Pass company name and design name along with other parameters to the service
+            byte[] pdfBytes = reportGenerationService.generateFinancialReport(inputJson, companyName, designName);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -41,4 +42,5 @@ public class ReportController {
             return ResponseEntity.status(500).body("Error generating the report".getBytes());
         }
     }
+
 }
