@@ -4,8 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 public class User {
@@ -19,6 +19,6 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
-
+    private Role role = Role.USER;
 }
+
