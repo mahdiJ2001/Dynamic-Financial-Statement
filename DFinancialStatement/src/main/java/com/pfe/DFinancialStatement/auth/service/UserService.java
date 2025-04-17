@@ -1,7 +1,7 @@
-package com.pfe.DFinancialStatement.user.service;
+package com.pfe.DFinancialStatement.auth.service;
 
-import com.pfe.DFinancialStatement.user.entity.User;
-import com.pfe.DFinancialStatement.user.repository.UserRepository;
+import com.pfe.DFinancialStatement.auth.entity.User;
+import com.pfe.DFinancialStatement.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,33 +17,19 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    // Créer un nouvel utilisateur
-    public User createUser(User user) {
-        return userRepository.save(user);
-    }
-
-    // Récupérer un utilisateur par son ID
+    // Get a user by ID
     public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
-    // Récupérer un utilisateur par son email
+    // Get a user by email
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
-    // Récupérer un utilisateur par son username
+    // Get a user by username
     public Optional<User> getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    // Mettre à jour un utilisateur
-    public User updateUser(User user) {
-        return userRepository.save(user);
-    }
-
-    // Supprimer un utilisateur par ID
-    public void deleteUser(Long id) {
-        userRepository.deleteById(id);
-    }
 }

@@ -10,16 +10,20 @@ public class FinancialStatementMapper {
     public FinancialStatement toEntity(FinancialStatementDTO dto) {
         FinancialStatement entity = new FinancialStatement();
         entity.setFormData(dto.getFormData());
-        entity.setReport(dto.getReport());  // Changed from setReportData to setReport
+        entity.setReport(dto.getReport());
         entity.setCreatedAt(dto.getCreatedAt());
+        // createdBy non mappé ici, car on suppose que c'est défini côté service
         return entity;
     }
 
     public FinancialStatementDTO toDTO(FinancialStatement entity) {
         FinancialStatementDTO dto = new FinancialStatementDTO();
         dto.setFormData(entity.getFormData());
-        dto.setReport(entity.getReport());  // Changed from setReportData to setReport
+        dto.setReport(entity.getReport());
         dto.setCreatedAt(entity.getCreatedAt());
+        if (entity.getCreatedBy() != null) {
+            dto.setContributorName(entity.getCreatedBy().getUsername()); // 👈 Set contributor
+        }
         return dto;
     }
 }

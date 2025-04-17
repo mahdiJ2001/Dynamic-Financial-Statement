@@ -1,4 +1,4 @@
-package com.pfe.DFinancialStatement.user.entity;
+package com.pfe.DFinancialStatement.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
