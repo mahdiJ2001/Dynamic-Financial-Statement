@@ -1,9 +1,11 @@
 package com.pfe.DFinancialStatement.financial_statement.entity;
 
+import com.pfe.DFinancialStatement.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,4 +28,8 @@ public class FinancialStatement {
 
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User createdBy;
 }

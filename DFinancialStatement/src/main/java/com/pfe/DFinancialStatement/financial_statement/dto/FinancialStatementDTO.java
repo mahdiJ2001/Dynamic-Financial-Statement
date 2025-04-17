@@ -8,4 +8,5 @@ public class FinancialStatementDTO {
     private String formData;
     private byte[] report;
     private LocalDateTime createdAt;
+    private String contributorName;
 }

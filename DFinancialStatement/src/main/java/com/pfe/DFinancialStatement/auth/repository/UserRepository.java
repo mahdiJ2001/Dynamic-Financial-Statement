@@ -1,6 +1,6 @@
-package com.pfe.DFinancialStatement.user.repository;
+package com.pfe.DFinancialStatement.auth.repository;
 
-import com.pfe.DFinancialStatement.user.entity.User;
+import com.pfe.DFinancialStatement.auth.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 

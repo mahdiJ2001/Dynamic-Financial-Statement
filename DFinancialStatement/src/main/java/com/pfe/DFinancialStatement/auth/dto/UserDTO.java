@@ -1,6 +1,6 @@
-package com.pfe.DFinancialStatement.user.dto;
+package com.pfe.DFinancialStatement.auth.dto;
 
-import com.pfe.DFinancialStatement.user.entity.Role;
+import com.pfe.DFinancialStatement.auth.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -1,7 +1,7 @@
-package com.pfe.DFinancialStatement.user.mapper;
+package com.pfe.DFinancialStatement.auth.mapper;
 
-import com.pfe.DFinancialStatement.user.dto.UserDTO;
-import com.pfe.DFinancialStatement.user.entity.User;
+import com.pfe.DFinancialStatement.auth.dto.UserDTO;
+import com.pfe.DFinancialStatement.auth.entity.User;
 import org.springframework.stereotype.Component;
 
 @Component
