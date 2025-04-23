@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
 
-    // Convertir User en UserDTO
     public UserDTO toDTO(User user) {
         if (user == null) {
             return null;
@@ -22,7 +21,6 @@ public class UserMapper {
         return userDTO;
     }
 
-    // Convertir UserDTO en User
     public User toEntity(UserDTO userDTO) {
         if (userDTO == null) {
             return null;

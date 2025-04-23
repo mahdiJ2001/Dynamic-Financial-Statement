@@ -43,17 +43,15 @@ public class FinancialStatementService {
 
     public Map<String, Object> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey,String designName) {
         try {
-            // Convert JSON string to Map
+
             Map<String, Object> rawData = objectMapper.readValue(dto.getFormData(), Map.class);
             Map<String, Object> inputData = new HashMap<>();
 
             extractFields(rawData, "actif", inputData);
             extractFields(rawData, "passif", inputData);
 
-            // Evaluate DMN rule
             String dmnResultJson = dmnEvaluationService.evaluateDmn(ruleKey, inputData);
 
-            // Parse decision result
             JSONObject jsonResult = new JSONObject(dmnResultJson);
             String decisionMessage = jsonResult.optString("decision", "Decision processed successfully").trim();
             String exceptionMessage = jsonResult.optString("exception", null);
@@ -64,15 +62,12 @@ public class FinancialStatementService {
 
             byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, "Company Name",designName);
 
-            // Map DTO to entity and attach the report
             FinancialStatement entity = financialStatementMapper.toEntity(dto);
             entity.setReport(reportPdf);
             entity.setCreatedAt(LocalDateTime.now());
 
-            // Call saveFinancialStatement method to save the financial statement
-            saveFinancialStatement(dto.getFormData(), reportPdf); // Save the formData and report
+            saveFinancialStatement(dto.getFormData(), reportPdf);
 
-            // Return result as JSON object
             Map<String, Object> result = new HashMap<>();
             result.put("status", "success");
             result.put("message", "Financial statement evaluated and saved successfully.");
@@ -88,12 +83,10 @@ public class FinancialStatementService {
         FinancialStatement statement = new FinancialStatement();
         statement.setFormData(formData);
         statement.setReport(reportBytes);
-        financialStatementRepository.save(statement);  // This saves the statement in the DB
+        financialStatementRepository.save(statement);
     }
 
 
-
-    // Helper method to extract fields from 'actif' or 'passif'
     private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {
         Object sectionData = rawData.get(section);
         if (sectionData instanceof List) {
@@ -117,14 +110,13 @@ public class FinancialStatementService {
                                             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
                                             .replaceAll("œ", "oe")
                                             .replaceAll("æ", "ae")
-                                            .replaceAll(" +", "_"); // Replace spaces with underscores
+                                            .replaceAll(" +", "_");
 
                                     // Convert value to number if possible
                                     if (fieldValue instanceof String) {
                                         try {
                                             fieldValue = Double.parseDouble((String) fieldValue);
                                         } catch (NumberFormatException e) {
-                                            // Keep as String if parsing fails
                                         }
                                     }
                                     inputData.put(key, fieldValue);

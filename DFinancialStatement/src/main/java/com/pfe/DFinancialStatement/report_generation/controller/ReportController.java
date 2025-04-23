@@ -1,6 +1,5 @@
 package com.pfe.DFinancialStatement.report_generation.controller;
 
-import com.pfe.DFinancialStatement.report_generation.json_structure.Root;
 import com.pfe.DFinancialStatement.report_generation.service.ReportGenerationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -25,15 +24,12 @@ public class ReportController {
     public ResponseEntity<byte[]> generateFinancialReport(@RequestBody Map<String, Object> inputJson,
                                                           @RequestParam String designName) {
         try {
-            // Extract company name from inputJson
             String companyName = (String) inputJson.get("companyName");
 
-            // Pass company name and design name along with other parameters to the service
             byte[] pdfBytes = reportGenerationService.generateFinancialReport(inputJson, companyName, designName);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
-            // "inline" to display in browser, or "attachment" to force download
             headers.setContentDispositionFormData("inline", "FinancialReport.pdf");
 
             return ResponseEntity.ok().headers(headers).body(pdfBytes);

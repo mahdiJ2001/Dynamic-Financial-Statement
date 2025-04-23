@@ -1,6 +1,5 @@
 package com.pfe.DFinancialStatement.dmn_rule.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
 import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
 import org.springframework.stereotype.Service;
@@ -55,16 +54,15 @@ public class DmnRuleStaticCompatibilityService {
         Set<String> inputFields = new HashSet<>();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            // Enable namespace awareness if needed (depending on your XML)
+
             factory.setNamespaceAware(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(new InputSource(new StringReader(xmlContent)));
 
-            // Set up XPath; adjust the XPath expression based on your DMN XML structure.
+
             XPathFactory xpathFactory = XPathFactory.newInstance();
             XPath xpath = xpathFactory.newXPath();
-            // Example XPath: select all "input" elements' "label" attributes.
-            // If your DMN XML uses a different structure, update this expression accordingly.
+
             XPathExpression expr = xpath.compile("//input/@label");
             NodeList nodes = (NodeList) expr.evaluate(document, XPathConstants.NODESET);
 
@@ -75,7 +73,7 @@ public class DmnRuleStaticCompatibilityService {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // You could throw a custom exception or log the error as needed
+
         }
         System.out.println("Extracted DMN input fields: " + inputFields);
         return inputFields;
@@ -91,7 +89,7 @@ public class DmnRuleStaticCompatibilityService {
     public List<DmnRule> findCompatibleDmns(Set<String> formFields) {
         System.out.println("Finding compatible DMNs using static analysis...");
 
-        // Normalize formFields
+
         Set<String> normalizedFormFields = formFields.stream()
                 .map(this::normalizeFieldName)
                 .collect(Collectors.toSet());
@@ -99,16 +97,13 @@ public class DmnRuleStaticCompatibilityService {
 
         List<DmnRule> compatible = new ArrayList<>();
 
-        // Check each DMN rule from the repository
+
         for (DmnRule rule : dmnRuleRepository.findAll()) {
             System.out.println("Processing DMN rule: " + rule.getRuleKey());
             String xmlContent = rule.getRuleContent();
 
-            // Extract the required input fields from the DMN XML
             Set<String> dmnInputs = extractInputFieldsFromXml(xmlContent);
 
-            // Check if all required DMN inputs are present in the form fields.
-            // The match is based on normalized values.
             if (normalizedFormFields.containsAll(dmnInputs)) {
                 compatible.add(rule);
                 System.out.println("DMN rule " + rule.getRuleKey() + " is compatible.");
