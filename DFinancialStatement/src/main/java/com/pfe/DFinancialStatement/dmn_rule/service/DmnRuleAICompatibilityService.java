@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
 import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,8 +21,11 @@ import java.util.stream.Collectors;
 public class DmnRuleAICompatibilityService {
 
     private final DmnRuleRepository dmnRuleRepository;
-    private static final String OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    private static final String OPENROUTER_API_KEY = "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";  // Utilise ta clé API
+    @Value("${openrouter.api.url}")
+    private String openRouterApiUrl;
+
+    @Value("${openrouter.api.key}")
+    private String openRouterApiKey;
 
     public DmnRuleAICompatibilityService(DmnRuleRepository dmnRuleRepository) {
         this.dmnRuleRepository = dmnRuleRepository;
@@ -54,7 +58,6 @@ public class DmnRuleAICompatibilityService {
     private boolean isCompatibleWithAI(String jsonContent, String xmlContent) throws IOException, InterruptedException {
         String prompt = buildPrompt(jsonContent, xmlContent);
 
-        // Construction de la charge utile (payload) en JSON
         String payload = String.format(
                 "{\"model\": \"deepseek/deepseek-r1-distill-llama-70b:free\", \"messages\": [{\"role\": \"user\", \"content\": \"%s\"}]}",
                 prompt.replace("\"", "\\\"")
@@ -62,16 +65,15 @@ public class DmnRuleAICompatibilityService {
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(OPENROUTER_API_URL))
+                .uri(URI.create(openRouterApiUrl))
                 .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + OPENROUTER_API_KEY)
+                .header("Authorization", "Bearer " + openRouterApiKey)
                 .POST(HttpRequest.BodyPublishers.ofString(payload))
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("Réponse de l'API AI: " + response.body());
 
-        // Parse de la réponse avec Jackson
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode root = objectMapper.readTree(response.body());
         JsonNode choices = root.path("choices");
@@ -105,13 +107,11 @@ public class DmnRuleAICompatibilityService {
         System.out.println("Finding compatible DMNs using AI...");
         List<DmnRule> compatible = new ArrayList<>();
 
-        // Normalisation des formFields
         Set<String> normalizedFormFields = formFields.stream()
                 .map(this::normalizeFieldName)
                 .collect(Collectors.toSet());
         System.out.println("Normalized form fields: " + normalizedFormFields);
 
-        // Génération du JSON à partir des formFields
         String jsonContent;
         try {
             jsonContent = new ObjectMapper().writeValueAsString(formFields);
@@ -119,11 +119,9 @@ public class DmnRuleAICompatibilityService {
             throw new RuntimeException("Erreur lors de la conversion des formFields en JSON", e);
         }
 
-        // ExecutorService pour l'exécution parallèle des requêtes API
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         List<Callable<Boolean>> tasks = new ArrayList<>();
 
-        // Pour chaque DMN, on crée une tâche qui enverra le JSON et le XML à l'API AI
         for (DmnRule rule : dmnRuleRepository.findAll()) {
             tasks.add(() -> {
                 System.out.println("Processing DMN rule: " + rule.getRuleKey());
@@ -144,7 +142,6 @@ public class DmnRuleAICompatibilityService {
         }
 
         try {
-            // Exécution parallèle des tâches
             executorService.invokeAll(tasks);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

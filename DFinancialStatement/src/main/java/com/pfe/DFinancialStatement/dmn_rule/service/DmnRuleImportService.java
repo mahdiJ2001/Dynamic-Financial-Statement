@@ -35,7 +35,6 @@ public class DmnRuleImportService {
         return dmnRuleRepository.save(dmnRule);
     }
 
-    // Get all DMN rules
     public List<DmnRule> getAllDmnRules() {
         return dmnRuleRepository.findAll();
     }

@@ -6,7 +6,6 @@ import com.pfe.DFinancialStatement.auth.dto.LoginRequestDTO;
 import com.pfe.DFinancialStatement.auth.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,42 +28,36 @@ public class AuthService {
     }
 
 
-    // Authenticate the user and generate a JWT token
     public Optional<String> authenticate(LoginRequestDTO loginRequestDTO) {
-        Optional<User> userOptional = userRepository.findByEmail(loginRequestDTO.getEmail()); // Using email for authentication
+        Optional<User> userOptional = userRepository.findByEmail(loginRequestDTO.getEmail());
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-                // Password matches, generate JWT
-                // Use toString() to convert role to a String if it's not already
-                String token = jwtUtil.generateToken(user.getEmail(), user.getRole().toString());  // Ensuring the role is a String
+                String token = jwtUtil.generateToken(user.getEmail(), user.getRole().toString());
                 return Optional.of(token);
             }
         }
 
-        return Optional.empty(); // Return empty if authentication fails
+        return Optional.empty();
     }
 
-    // Validate a given JWT token
     public boolean validateToken(String token) {
         try {
-            jwtUtil.validateToken(token); // This will verify the token's validity
+            jwtUtil.validateToken(token);
             return true;
         } catch (JwtException e) {
-            return false; // Token validation failed
+            return false;
         }
     }
 
-    // Register a new user (includes checking if the user already exists)
     public Optional<User> register(User user) {
-        // Check if user already exists by email
+
         if (userService.getUserByEmail(user.getEmail()).isPresent()) {
-            return Optional.empty(); // Return empty if user already exists
+            return Optional.empty();
         }
 
-        // Encrypt the password before saving it
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return Optional.of(userRepository.save(user)); // Return saved user if registration successful
+        return Optional.of(userRepository.save(user));
     }
 }

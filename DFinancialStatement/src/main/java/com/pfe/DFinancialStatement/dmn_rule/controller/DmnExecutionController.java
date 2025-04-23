@@ -52,7 +52,7 @@ public class DmnExecutionController {
         }
     }
 
-    // Uncomment the endpoint below to use the AI-based compatibility service.
+    
     @GetMapping("/dmn/compatible/ai")
     public ResponseEntity<List<DmnRule>> getCompatibleDmnsAI(@RequestParam("fields") String fields) {
         Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));
@@ -60,7 +60,7 @@ public class DmnExecutionController {
         return ResponseEntity.ok(compatibleDmns);
     }
 
-    // Static compatibility endpoint
+
     @GetMapping("/dmn/compatible/static")
     public ResponseEntity<List<DmnRule>> getCompatibleDmnsStatic(@RequestParam("fields") String fields) {
         Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));

@@ -12,7 +12,7 @@ public class FinancialStatementMapper {
         entity.setFormData(dto.getFormData());
         entity.setReport(dto.getReport());
         entity.setCreatedAt(dto.getCreatedAt());
-        // createdBy non mappé ici, car on suppose que c'est défini côté service
+
         return entity;
     }
 
@@ -22,7 +22,7 @@ public class FinancialStatementMapper {
         dto.setReport(entity.getReport());
         dto.setCreatedAt(entity.getCreatedAt());
         if (entity.getCreatedBy() != null) {
-            dto.setContributorName(entity.getCreatedBy().getUsername()); // 👈 Set contributor
+            dto.setContributorName(entity.getCreatedBy().getUsername());
         }
         return dto;
     }

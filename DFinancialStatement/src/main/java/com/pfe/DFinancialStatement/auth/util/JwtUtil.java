@@ -17,14 +17,12 @@ public class JwtUtil {
 
     private final Key secretKey;
 
-    // Initialize the HMAC-SHA key from a Base64-encoded secret
     public JwtUtil(@Value("${jwt.secret}") String secret) {
         byte[] keyBytes = Base64.getDecoder()
                 .decode(secret.getBytes(StandardCharsets.UTF_8));
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // Generate a JWT with subject (username) and role, valid for 10 hours
     public String generateToken(String username, String role) {
         return Jwts.builder()
                 .subject(username)
@@ -35,7 +33,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Validate the JWT by verifying its signature and parsing its signed claims
     public void validateToken(String token) {
         try {
             Jwts.parser()
@@ -49,7 +46,7 @@ public class JwtUtil {
         }
     }
 
-    // Extract the username (subject) from the JWT
+
     public String extractUsername(String token) {
         return Jwts.parser()
                 .verifyWith((SecretKey) secretKey)
@@ -59,7 +56,7 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // Check if the JWT has expired
+
     public boolean isTokenExpired(String token) {
         Date expiration = Jwts.parser()
                 .verifyWith((SecretKey) secretKey)

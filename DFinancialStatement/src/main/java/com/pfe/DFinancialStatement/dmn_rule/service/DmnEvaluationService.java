@@ -51,7 +51,6 @@ public class DmnEvaluationService {
 
         String jsonResult = objectMapper.writeValueAsString(cleanedResult);
 
-        // Log the evaluation result
         logger.info("DMN Evaluation Result: {}", jsonResult);
 
         return jsonResult;

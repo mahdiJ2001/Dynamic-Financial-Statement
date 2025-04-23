@@ -21,40 +21,37 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // Authentification d'un utilisateur et génération d'un JWT
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
         Optional<String> tokenOptional = authService.authenticate(loginRequestDTO);
 
         if (tokenOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized if no token
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         String token = tokenOptional.get();
-        return ResponseEntity.ok(new LoginResponseDTO(token)); // Return the generated token
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
-    // Valider un token JWT
     @GetMapping("/validate")
     public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String authHeader) {
-        // Authorization: Bearer <token>
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Unauthorized if header is missing or invalid
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        boolean isValid = authService.validateToken(authHeader.substring(7)); // Check token validity
-        return isValid ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build(); // Return appropriate status
+        boolean isValid = authService.validateToken(authHeader.substring(7));
+        return isValid ? ResponseEntity.ok().build() : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
-    // Register a new user
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid @RequestBody User user) {
         Optional<User> newUserOptional = authService.register(user);
 
         if (newUserOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Bad Request if user already exists
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(newUserOptional.get()); // Return the newly created user
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUserOptional.get());
     }
 }
