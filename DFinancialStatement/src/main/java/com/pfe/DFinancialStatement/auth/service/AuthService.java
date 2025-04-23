@@ -27,14 +27,14 @@ public class AuthService {
         this.userService = userService;
     }
 
-
     public Optional<String> authenticate(LoginRequestDTO loginRequestDTO) {
         Optional<User> userOptional = userRepository.findByEmail(loginRequestDTO.getEmail());
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-                String token = jwtUtil.generateToken(user.getEmail(), user.getRole().toString());
+                // ✅ Génération du token avec username, email, et role
+                String token = jwtUtil.generateToken(user.getUsername(), user.getEmail(), user.getRole().toString());
                 return Optional.of(token);
             }
         }
@@ -52,7 +52,6 @@ public class AuthService {
     }
 
     public Optional<User> register(User user) {
-
         if (userService.getUserByEmail(user.getEmail()).isPresent()) {
             return Optional.empty();
         }
