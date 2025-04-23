@@ -23,12 +23,14 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username, String role) {
+    public String generateToken(String username, String email, String role) {
         return Jwts.builder()
-                .subject(username)
+                .subject(email) // ✅ On utilise email comme subject
+                .claim("username", username)
+                .claim("email", email)
                 .claim("role", role)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 10))
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 10)) // 10h
                 .signWith(secretKey)
                 .compact();
     }
@@ -46,16 +48,23 @@ public class JwtUtil {
         }
     }
 
-
     public String extractUsername(String token) {
         return Jwts.parser()
                 .verifyWith((SecretKey) secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .getSubject();
+                .get("username", String.class);
     }
 
+    public String extractEmail(String token) {
+        return Jwts.parser()
+                .verifyWith((SecretKey) secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject(); // ✅ Le subject est l'email ici
+    }
 
     public boolean isTokenExpired(String token) {
         Date expiration = Jwts.parser()
