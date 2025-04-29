@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
+import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
 
 @Entity
 @Table(name = "financial_statements")
@@ -32,4 +33,11 @@ public class FinancialStatement {
     @ManyToOne
     @JoinColumn(name = "created_by")
     private User createdBy;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private StatementStatus status = StatementStatus.PENDING;
+
+    @Column(name = "rejection_cause")
+    private String rejectionCause;
 }

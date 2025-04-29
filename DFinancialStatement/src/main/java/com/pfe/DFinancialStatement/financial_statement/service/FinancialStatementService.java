@@ -6,6 +6,7 @@ import com.pfe.DFinancialStatement.dmn_rule.service.DmnEvaluationService;
 import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
 import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatement;
+import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
 import com.pfe.DFinancialStatement.financial_statement.mapper.FinancialStatementMapper;
 import com.pfe.DFinancialStatement.financial_statement.repository.FinancialStatementRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -91,18 +92,9 @@ public class FinancialStatementService {
 
             return result;
         } catch (Exception e) {
-            logger.error("Error during financial statement evaluation and saving", e); // Log the error
+            logger.error("Error during financial statement evaluation and saving", e);
             throw new CustomException("Error evaluating financial statement: " + e.getMessage());
         }
-    }
-
-    public void saveFinancialStatement(String formData, byte[] reportBytes) {
-        FinancialStatement statement = new FinancialStatement();
-        User currentUser = authService.getCurrentUser();
-        statement.setCreatedBy(currentUser);
-        statement.setFormData(formData);
-        statement.setReport(reportBytes);
-        financialStatementRepository.save(statement);
     }
 
 
@@ -156,4 +148,42 @@ public class FinancialStatementService {
     public Optional<FinancialStatementDTO> getFinancialStatementById(Long id) {
         return financialStatementRepository.findById(id).map(financialStatementMapper::toDTO);
     }
+
+    public Map<String, Object> updateStatus(Long id, String status, String rejectionCause) {
+        try {
+            // Convert the status string to a StatementStatus enum
+            StatementStatus statementStatus = StatementStatus.valueOf(status.toUpperCase());
+
+            // Fetch the financial statement by ID
+            Optional<FinancialStatement> financialStatementOpt = financialStatementRepository.findById(id);
+
+            if (financialStatementOpt.isPresent()) {
+                FinancialStatement financialStatement = financialStatementOpt.get();
+                financialStatement.setStatus(statementStatus);
+
+                // If the status is REJECTED, set the rejection cause
+                if (statementStatus == StatementStatus.REJECTED && rejectionCause != null) {
+                    financialStatement.setRejectionCause(rejectionCause);
+                }
+
+                // Save the updated financial statement
+                financialStatementRepository.save(financialStatement);
+
+                // Prepare and return the success response
+                Map<String, Object> result = new HashMap<>();
+                result.put("status", "success");
+                result.put("message", "Financial statement status updated successfully.");
+                return result;
+            } else {
+                throw new CustomException("Financial statement not found.");
+            }
+        } catch (IllegalArgumentException e) {
+            throw new CustomException("Invalid status value provided.");
+        } catch (Exception e) {
+            logger.error("Error updating financial statement status", e);
+            throw new CustomException("Error updating status: " + e.getMessage());
+        }
+    }
+
+
 }
