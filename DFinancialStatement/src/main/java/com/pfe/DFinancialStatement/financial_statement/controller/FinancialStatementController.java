@@ -1,6 +1,7 @@
 package com.pfe.DFinancialStatement.financial_statement.controller;
 
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
+import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
 import com.pfe.DFinancialStatement.financial_statement.service.FinancialStatementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,15 @@ public class FinancialStatementController {
 
         Map<String, Object> result = financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey, designName);
 
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/status/{id}")
+    public ResponseEntity<Map<String, Object>> updateStatus(
+            @PathVariable Long id,
+            @RequestParam String status,
+            @RequestParam(required = false) String rejectionCause) {  // Make rejectionCause optional
+        Map<String, Object> result = financialStatementService.updateStatus(id, status, rejectionCause);
         return ResponseEntity.ok(result);
     }
 
