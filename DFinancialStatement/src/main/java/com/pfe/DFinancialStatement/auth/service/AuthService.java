@@ -6,6 +6,8 @@ import com.pfe.DFinancialStatement.auth.dto.LoginRequestDTO;
 import com.pfe.DFinancialStatement.auth.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +35,6 @@ public class AuthService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-                // ✅ Génération du token avec username, email, et role
                 String token = jwtUtil.generateToken(user.getUsername(), user.getEmail(), user.getRole().toString());
                 return Optional.of(token);
             }
@@ -58,5 +59,20 @@ public class AuthService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return Optional.of(userRepository.save(user));
+    }
+
+
+    public User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
 }

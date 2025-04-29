@@ -1,5 +1,7 @@
 package com.pfe.DFinancialStatement.financial_statement.service;
 
+import com.pfe.DFinancialStatement.auth.entity.User;
+import com.pfe.DFinancialStatement.auth.service.AuthService;
 import com.pfe.DFinancialStatement.dmn_rule.service.DmnEvaluationService;
 import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
@@ -40,34 +42,48 @@ public class FinancialStatementService {
     @Autowired
     private ReportGenerationService reportGenerationService;
 
+    @Autowired
+    private AuthService authService;
 
-    public Map<String, Object> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey,String designName) {
+
+    public Map<String, Object> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey, String designName) {
         try {
-
+            // Parse the form data from the DTO
             Map<String, Object> rawData = objectMapper.readValue(dto.getFormData(), Map.class);
             Map<String, Object> inputData = new HashMap<>();
 
+            // Extract fields related to "actif" and "passif"
             extractFields(rawData, "actif", inputData);
             extractFields(rawData, "passif", inputData);
 
+            // Evaluate DMN rules
             String dmnResultJson = dmnEvaluationService.evaluateDmn(ruleKey, inputData);
 
             JSONObject jsonResult = new JSONObject(dmnResultJson);
             String decisionMessage = jsonResult.optString("decision", "Decision processed successfully").trim();
             String exceptionMessage = jsonResult.optString("exception", null);
 
+            // Handle exception message
             if (exceptionMessage != null && !exceptionMessage.trim().isEmpty() && !"null".equals(exceptionMessage.trim())) {
                 throw new CustomException(exceptionMessage);
             }
 
-            byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, "Company Name",designName);
+            // Generate the financial report (PDF)
+            byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, "Company Name", designName);
 
+            // Map DTO to FinancialStatement entity
             FinancialStatement entity = financialStatementMapper.toEntity(dto);
             entity.setReport(reportPdf);
             entity.setCreatedAt(LocalDateTime.now());
 
-            saveFinancialStatement(dto.getFormData(), reportPdf);
+            // Set the current user as the creator
+            User currentUser = authService.getCurrentUser();
+            entity.setCreatedBy(currentUser);
 
+            // Save the financial statement
+            financialStatementRepository.save(entity);
+
+            // Prepare response
             Map<String, Object> result = new HashMap<>();
             result.put("status", "success");
             result.put("message", "Financial statement evaluated and saved successfully.");
@@ -75,12 +91,15 @@ public class FinancialStatementService {
 
             return result;
         } catch (Exception e) {
-            throw new CustomException(e.getMessage());
+            logger.error("Error during financial statement evaluation and saving", e); // Log the error
+            throw new CustomException("Error evaluating financial statement: " + e.getMessage());
         }
     }
 
     public void saveFinancialStatement(String formData, byte[] reportBytes) {
         FinancialStatement statement = new FinancialStatement();
+        User currentUser = authService.getCurrentUser();
+        statement.setCreatedBy(currentUser);
         statement.setFormData(formData);
         statement.setReport(reportBytes);
         financialStatementRepository.save(statement);
