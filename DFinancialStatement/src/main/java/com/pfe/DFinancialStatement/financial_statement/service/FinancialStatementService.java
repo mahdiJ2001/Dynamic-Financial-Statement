@@ -57,6 +57,9 @@ public class FinancialStatementService {
             extractFields(rawData, "actif", inputData);
             extractFields(rawData, "passif", inputData);
 
+            // Extract the company name from the form data
+            String companyName = (String) rawData.get("companyName");
+
             // Evaluate DMN rules
             String dmnResultJson = dmnEvaluationService.evaluateDmn(ruleKey, inputData);
 
@@ -69,13 +72,15 @@ public class FinancialStatementService {
                 throw new CustomException(exceptionMessage);
             }
 
-            // Generate the financial report (PDF)
-            byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, "Company Name", designName);
+            // Generate the financial report (PDF) with the company name
+            byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, companyName, designName);
 
             // Map DTO to FinancialStatement entity
             FinancialStatement entity = financialStatementMapper.toEntity(dto);
             entity.setReport(reportPdf);
             entity.setCreatedAt(LocalDateTime.now());
+
+            entity.setCompanyName(companyName);
 
             // Set the current user as the creator
             User currentUser = authService.getCurrentUser();
@@ -96,6 +101,7 @@ public class FinancialStatementService {
             throw new CustomException("Error evaluating financial statement: " + e.getMessage());
         }
     }
+
 
 
     private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {

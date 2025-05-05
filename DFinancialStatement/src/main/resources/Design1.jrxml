@@ -298,9 +298,49 @@
         </band>
     </detail>
     <pageFooter>
-        <band height="30" splitType="Stretch">
+        <band height="90" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="0" width="267" height="60" uuid="8f800b5c-aa2f-4dd8-a4d2-af33f27c9478"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="CategoryHeader" mode="Transparent" x="0" y="0" width="267" height="20" forecolor="#333333" uuid="8f800b5c-aa2f-4dd8-a4d2-af33f27c9478"/>
+                <box>
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.5" lineColor="#CCCCCC"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="10" isBold="true" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Signature du comptable :]]></text>
+            </staticText>
+            <rectangle>
+                <reportElement x="268" y="0" width="267" height="60" uuid="7761324e-5934-498c-bfb8-356aacab2053"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
+                </graphicElement>
+            </rectangle>
+            <staticText>
+                <reportElement style="CategoryHeader" mode="Transparent" x="268" y="0" width="267" height="20" forecolor="#333333" backcolor="#FFFFFF" uuid="7761324e-5934-498c-bfb8-356aacab2053"/>
+                <box>
+                    <pen lineWidth="0.0"/>
+                    <topPen lineWidth="0.0"/>
+                    <leftPen lineWidth="0.0"/>
+                    <bottomPen lineWidth="0.5" lineColor="#CCCCCC"/>
+                    <rightPen lineWidth="0.0"/>
+                </box>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font fontName="Arial" size="10" isBold="true" isItalic="true"/>
+                </textElement>
+                <text><![CDATA[Signature du dirigeant :]]></text>
+            </staticText>
             <textField>
-                <reportElement x="0" y="10" width="535" height="20" forecolor="#666666" uuid="8d44e7e5-2d7a-4b88-ba28-c21753a85a8e"/>
+                <reportElement x="0" y="70" width="535" height="20" forecolor="#666666" uuid="8d44e7e5-2d7a-4b88-ba28-c21753a85a8e"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font fontName="Arial" size="8"/>
                 </textElement>
@@ -309,7 +349,7 @@
         </band>
     </pageFooter>
     <summary>
-        <band height="160" splitType="Stretch">
+        <band height="70" splitType="Stretch">
             <rectangle>
                 <reportElement mode="Opaque" x="0" y="10" width="535" height="40" backcolor="#F8F8F8" uuid="8a6fb28f-7194-494f-a4d8-8a8d130ccaee"/>
                 <graphicElement>
@@ -350,46 +390,6 @@
                 </textElement>
                 <textFieldExpression><![CDATA[$V{TOTAL_PASSIF}]]></textFieldExpression>
             </textField>
-            <rectangle>
-                <reportElement x="0" y="70" width="267" height="60" uuid="8f800b5c-aa2f-4dd8-a4d2-af33f27c9478"/>
-                <graphicElement>
-                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
-                </graphicElement>
-            </rectangle>
-            <staticText>
-                <reportElement style="CategoryHeader" mode="Transparent" x="0" y="70" width="267" height="20" forecolor="#333333" uuid="8f800b5c-aa2f-4dd8-a4d2-af33f27c9478"/>
-                <box>
-                    <pen lineWidth="0.0"/>
-                    <topPen lineWidth="0.0"/>
-                    <leftPen lineWidth="0.0"/>
-                    <bottomPen lineWidth="0.5" lineColor="#CCCCCC"/>
-                    <rightPen lineWidth="0.0"/>
-                </box>
-                <textElement textAlignment="Center" verticalAlignment="Middle">
-                    <font fontName="Arial" size="10" isBold="true" isItalic="true"/>
-                </textElement>
-                <text><![CDATA[Signature du comptable :]]></text>
-            </staticText>
-            <rectangle>
-                <reportElement x="268" y="70" width="267" height="60" uuid="7761324e-5934-498c-bfb8-356aacab2053"/>
-                <graphicElement>
-                    <pen lineWidth="0.5" lineColor="#CCCCCC"/>
-                </graphicElement>
-            </rectangle>
-            <staticText>
-                <reportElement style="CategoryHeader" mode="Transparent" x="268" y="70" width="267" height="20" forecolor="#333333" backcolor="#FFFFFF" uuid="7761324e-5934-498c-bfb8-356aacab2053"/>
-                <box>
-                    <pen lineWidth="0.0"/>
-                    <topPen lineWidth="0.0"/>
-                    <leftPen lineWidth="0.0"/>
-                    <bottomPen lineWidth="0.5" lineColor="#CCCCCC"/>
-                    <rightPen lineWidth="0.0"/>
-                </box>
-                <textElement textAlignment="Center" verticalAlignment="Middle">
-                    <font fontName="Arial" size="10" isBold="true" isItalic="true"/>
-                </textElement>
-                <text><![CDATA[Signature du dirigeant :]]></text>
-            </staticText>
         </band>
     </summary>
     <noData>

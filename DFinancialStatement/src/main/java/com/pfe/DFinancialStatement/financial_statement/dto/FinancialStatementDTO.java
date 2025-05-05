@@ -13,4 +13,5 @@ public class FinancialStatementDTO {
     private String contributorName;
     private StatementStatus status;
     private String rejectionCause;
+    private String companyName;
 }

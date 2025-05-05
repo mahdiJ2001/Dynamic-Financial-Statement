@@ -27,6 +27,9 @@ public class FinancialStatement {
     @Column(name = "report")
     private byte[] report;
 
+    @Column(name = "company_name")
+    private String companyName;
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -40,4 +43,5 @@ public class FinancialStatement {
 
     @Column(name = "rejection_cause")
     private String rejectionCause;
+
 }
