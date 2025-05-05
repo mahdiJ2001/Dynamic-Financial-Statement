@@ -43,7 +43,7 @@ public class DmnRuleAICompatibilityService {
         return normalizedName;
     }
 
-    private String buildPrompt(String jsonContent, String xmlContent) {
+    /*private String buildPrompt(String jsonContent, String xmlContent) {
         String promptTemplate = "A DMN and a JSON are considered compatible if and only if all input labels required by the DMN XML are present inside the JSON, considering normalization. Normalization rules include:\n\n" +
                 " - Spaces (\" \") can be replaced by underscores (\"_\").\n" +
                 " - Accented characters (e.g., \"é\") can be replaced by their non-accented equivalent (\"e\").\n" +
@@ -53,7 +53,37 @@ public class DmnRuleAICompatibilityService {
                 "This is the JSON: %s\n" +
                 "This is the XML: %s";
         return String.format(promptTemplate, jsonContent, xmlContent);
+    }*/
+
+    private String buildPrompt(String jsonContent, String xmlContent) {
+        String promptTemplate = """
+        A DMN and a JSON are considered compatible if and only if all input labels required by the DMN XML are present in the JSON keys, after applying the *same normalization rules* to both. 
+
+        Normalization rules to apply to all labels and keys:
+        - Replace all spaces (" ") with underscores ("_").
+        - Remove all accents (e.g., "é" becomes "e").
+        - Convert everything to lowercase.
+        - Ignore extra fields in the JSON.
+
+        After normalization, compare the DMN input labels with the JSON keys:
+        - If every DMN input is present in the JSON → Answer 1.
+        - Otherwise → Answer 0.
+
+        Respond only with a single digit (1 or 0), no explanation.
+
+        JSON:
+        ```json
+        %s
+        ```
+
+        XML:
+        ```xml
+        %s
+        ```
+        """;
+        return String.format(promptTemplate, jsonContent, xmlContent);
     }
+
 
     private boolean isCompatibleWithAI(String jsonContent, String xmlContent) throws IOException, InterruptedException {
         String prompt = buildPrompt(jsonContent, xmlContent);

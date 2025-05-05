@@ -16,6 +16,7 @@ public class FinancialStatementMapper {
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setStatus(dto.getStatus() != null ? dto.getStatus() : StatementStatus.PENDING);
         entity.setRejectionCause(dto.getRejectionCause());
+        entity.setCompanyName(dto.getCompanyName());
         return entity;
     }
 
@@ -27,10 +28,12 @@ public class FinancialStatementMapper {
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setStatus(entity.getStatus());
         dto.setRejectionCause(entity.getRejectionCause());
+        dto.setCompanyName(entity.getCompanyName());
         if (entity.getCreatedBy() != null) {
             dto.setContributorName(entity.getCreatedBy().getUsername());
         }
         return dto;
     }
+
 }
 

@@ -49,10 +49,11 @@ public class ReportGenerationService {
 
 
     private Root convertJsonToRoot(Map<String, Object> inputJson) {
+        // Extract company name
+        String companyName = (String) inputJson.get("companyName");
 
         List<Map<String, Object>> actifList = (List<Map<String, Object>>) inputJson.get("actif");
         List<Map<String, Object>> passifList = (List<Map<String, Object>>) inputJson.get("passif");
-
 
         List<Actif> actives = new ArrayList<>();
         for (Map<String, Object> actifMap : actifList) {
@@ -85,6 +86,7 @@ public class ReportGenerationService {
         }
 
         Root root = new Root();
+        root.setCompanyName(companyName); // Set the company name
         root.setActif(actives);
         root.setPassif(passives);
 

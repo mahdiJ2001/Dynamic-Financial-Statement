@@ -25,6 +25,7 @@ public class ReportController {
                                                           @RequestParam String designName) {
         try {
             String companyName = (String) inputJson.get("companyName");
+            System.out.println(companyName);
 
             byte[] pdfBytes = reportGenerationService.generateFinancialReport(inputJson, companyName, designName);
 
