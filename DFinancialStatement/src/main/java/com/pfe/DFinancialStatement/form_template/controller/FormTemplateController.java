@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -36,12 +38,15 @@ public class FormTemplateController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTemplate(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteTemplate(@PathVariable Long id) {
         boolean deleted = formTemplateService.deleteTemplate(id);
         if (deleted) {
-            return ResponseEntity.ok("Template deleted successfully");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Template deleted successfully");
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
 }
