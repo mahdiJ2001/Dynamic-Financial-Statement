@@ -4,6 +4,8 @@ import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
 import com.pfe.DFinancialStatement.dmn_rule.service.DmnRuleImportService;
 import com.pfe.DFinancialStatement.dmn_rule.service.DmnRuleAICompatibilityService;
 import com.pfe.DFinancialStatement.dmn_rule.service.DmnRuleStaticCompatibilityService;
+import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
+import com.pfe.DFinancialStatement.error_messages.service.ErrorMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +21,17 @@ public class DmnExecutionController {
     private final DmnRuleAICompatibilityService dmnRuleAICompatibilityService;
     private final DmnRuleStaticCompatibilityService dmnRuleStaticCompatibilityService;
 
+    private final ErrorMessageService errorMessageService;
+
+
     @Autowired
     public DmnExecutionController(DmnRuleImportService dmnRuleImportService,
                                   DmnRuleAICompatibilityService dmnRuleAICompatibilityService,
-                                  DmnRuleStaticCompatibilityService dmnRuleStaticCompatibilityService) {
+                                  DmnRuleStaticCompatibilityService dmnRuleStaticCompatibilityService, ErrorMessageService errorMessageService) {
         this.dmnRuleImportService = dmnRuleImportService;
         this.dmnRuleAICompatibilityService = dmnRuleAICompatibilityService;
         this.dmnRuleStaticCompatibilityService = dmnRuleStaticCompatibilityService;
+        this.errorMessageService = errorMessageService;
     }
 
     @GetMapping("/dmn")
@@ -44,15 +50,22 @@ public class DmnExecutionController {
             response.put("message", "DMN importé avec succès");
             response.put("ruleKey", rule.getRuleKey());
             return ResponseEntity.ok(response);
+        } catch (CustomException e) {
+            String errorMessage = errorMessageService.getErrorMessage(e.getErrorCode());
+
+            Map<String, String> response = new HashMap<>();
+            response.put("error", errorMessage);
+            return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Erreur lors de l'import du DMN");
-            errorResponse.put("details", e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Erreur interne : " + e.getMessage()));
         }
     }
 
-    
+
+
+
+
     @GetMapping("/dmn/compatible/ai")
     public ResponseEntity<List<DmnRule>> getCompatibleDmnsAI(@RequestParam("fields") String fields) {
         Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));
