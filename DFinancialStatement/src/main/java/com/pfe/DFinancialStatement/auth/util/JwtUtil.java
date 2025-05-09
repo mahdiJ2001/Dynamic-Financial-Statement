@@ -25,12 +25,12 @@ public class JwtUtil {
 
     public String generateToken(String username, String email, String role) {
         return Jwts.builder()
-                .subject(email) // ✅ On utilise email comme subject
+                .subject(email)
                 .claim("username", username)
                 .claim("email", email)
                 .claim("role", role)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 10)) // 10h
+                .expiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 10))
                 .signWith(secretKey)
                 .compact();
     }
@@ -63,7 +63,7 @@ public class JwtUtil {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
-                .getSubject(); // ✅ Le subject est l'email ici
+                .getSubject();
     }
 
     public boolean isTokenExpired(String token) {
