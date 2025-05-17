@@ -62,10 +62,6 @@ public class DmnExecutionController {
         }
     }
 
-
-
-
-
     @GetMapping("/dmn/compatible/ai")
     public ResponseEntity<List<DmnRule>> getCompatibleDmnsAI(@RequestParam("fields") String fields) {
         Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));
