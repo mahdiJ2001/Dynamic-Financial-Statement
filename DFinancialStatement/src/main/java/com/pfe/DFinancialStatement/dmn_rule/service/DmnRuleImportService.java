@@ -38,4 +38,21 @@ public class DmnRuleImportService {
     public List<DmnRule> getAllDmnRules() {
         return dmnRuleRepository.findAll();
     }
+
+    public boolean existsByRuleKey(String ruleKey) {
+        return dmnRuleRepository.findByRuleKey(ruleKey).isPresent();
+    }
+
+    public DmnRule saveNewDmnRule(String ruleKey, String ruleContent) {
+        if (dmnRuleRepository.findByRuleKey(ruleKey).isPresent()) {
+            throw new CustomException("RULE_KEY_EXISTS");
+        }
+
+        DmnRule dmnRule = new DmnRule();
+        dmnRule.setRuleKey(ruleKey);
+        dmnRule.setRuleContent(ruleContent);
+
+        return dmnRuleRepository.save(dmnRule);
+    }
+
 }
