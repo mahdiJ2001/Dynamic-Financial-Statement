@@ -22,7 +22,8 @@ public class DmnXmlGenerationService {
         for (RuleDto dto : ruleDtos) {
             String key = dto.getMessageErreur();
             groupedConditions.putIfAbsent(key, new LinkedHashMap<>());
-            groupedConditions.get(key).put(dto.getExpression(), dto.getCondition());
+            String fullCondition = dto.getCondition() + dto.getValue();
+            groupedConditions.get(key).put(dto.getExpression(), fullCondition);
             severities.put(key, dto.getSeverite());
         }
 

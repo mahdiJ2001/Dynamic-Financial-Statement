@@ -2,6 +2,7 @@ package com.pfe.DFinancialStatement.financial_statement.service;
 
 import com.pfe.DFinancialStatement.auth.entity.User;
 import com.pfe.DFinancialStatement.auth.service.AuthService;
+import com.pfe.DFinancialStatement.dmn_rule.dto.ExpressionEvaluationResult;
 import com.pfe.DFinancialStatement.dmn_rule.service.DmnEvaluationService;
 import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
@@ -18,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.text.Normalizer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class FinancialStatementService {
@@ -47,61 +45,49 @@ public class FinancialStatementService {
     private AuthService authService;
 
 
-    public Map<String, Object> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey, String designName) {
+    public List<ExpressionEvaluationResult> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey, String designName) {
+        List<ExpressionEvaluationResult> evaluationResults = new ArrayList<>();
+
         try {
-            // Parse the form data from the DTO
             Map<String, Object> rawData = objectMapper.readValue(dto.getFormData(), Map.class);
             Map<String, Object> inputData = new HashMap<>();
 
-            // Extract fields related to "actif" and "passif"
             extractFields(rawData, "actif", inputData);
             extractFields(rawData, "passif", inputData);
 
-            // Extract the company name from the form data
             String companyName = (String) rawData.get("companyName");
 
-            // Evaluate DMN rules
-            String dmnResultJson = dmnEvaluationService.evaluateDmn(ruleKey, inputData);
+            evaluationResults = dmnEvaluationService.evaluateDmn(ruleKey, inputData);
 
-            JSONObject jsonResult = new JSONObject(dmnResultJson);
-            String decisionMessage = jsonResult.optString("decision", "Decision processed successfully").trim();
-            String exceptionMessage = jsonResult.optString("exception", null);
+            String evaluationJson = objectMapper.writeValueAsString(evaluationResults);
 
-            // Handle exception message
-            if (exceptionMessage != null && !exceptionMessage.trim().isEmpty() && !"null".equals(exceptionMessage.trim())) {
-                throw new CustomException(exceptionMessage);
+            boolean hasBlockingError = evaluationResults.stream()
+                    .anyMatch(result -> "bloquant".equalsIgnoreCase(result.getSeverite()));
+
+            if (hasBlockingError) {
+                return evaluationResults;
             }
 
-            // Generate the financial report (PDF) with the company name
             byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, companyName, designName);
 
-            // Map DTO to FinancialStatement entity
             FinancialStatement entity = financialStatementMapper.toEntity(dto);
             entity.setReport(reportPdf);
             entity.setCreatedAt(LocalDateTime.now());
-
             entity.setCompanyName(companyName);
+            entity.setEvaluationResult(evaluationJson);
 
-            // Set the current user as the creator
             User currentUser = authService.getCurrentUser();
             entity.setCreatedBy(currentUser);
 
-            // Save the financial statement
             financialStatementRepository.save(entity);
 
-            // Prepare response
-            Map<String, Object> result = new HashMap<>();
-            result.put("status", "success");
-            result.put("message", "Financial statement evaluated and saved successfully.");
-            result.put("result", decisionMessage);
-
-            return result;
         } catch (Exception e) {
             logger.error("Error during financial statement evaluation and saving", e);
-            throw new CustomException("Error evaluating financial statement: " + e.getMessage());
-        }
-    }
 
+        }
+
+        return evaluationResults;
+    }
 
 
     private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {
