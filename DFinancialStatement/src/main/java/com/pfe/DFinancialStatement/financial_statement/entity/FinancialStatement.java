@@ -44,4 +44,7 @@ public class FinancialStatement {
     @Column(name = "rejection_cause")
     private String rejectionCause;
 
+    @Column(name = "evaluation_result", columnDefinition = "TEXT")
+    private String evaluationResult;
+
 }

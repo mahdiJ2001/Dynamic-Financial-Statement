@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 public class RuleDto {
     private String expression;
     private String condition;
+    private String value;
     private String messageErreur;
     private String severite;
 }
+

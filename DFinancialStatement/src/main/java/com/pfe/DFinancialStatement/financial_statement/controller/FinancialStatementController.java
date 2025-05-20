@@ -1,5 +1,6 @@
 package com.pfe.DFinancialStatement.financial_statement.controller;
 
+import com.pfe.DFinancialStatement.dmn_rule.dto.ExpressionEvaluationResult;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
 import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
 import com.pfe.DFinancialStatement.financial_statement.service.FinancialStatementService;
@@ -31,22 +32,23 @@ public class FinancialStatementController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> evaluateAndSaveFinancialStatement(
+    public ResponseEntity<List<ExpressionEvaluationResult>> evaluateAndSaveFinancialStatement(
             @RequestBody FinancialStatementDTO financialStatementDTO,
             @RequestParam String ruleKey,
             @RequestParam String designName) {
 
+        List<ExpressionEvaluationResult> evaluationResults =
+                financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey, designName);
 
-        Map<String, Object> result = financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey, designName);
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(evaluationResults);
     }
+
 
     @PutMapping("/status/{id}")
     public ResponseEntity<Map<String, Object>> updateStatus(
             @PathVariable Long id,
             @RequestParam String status,
-            @RequestParam(required = false) String rejectionCause) {  // Make rejectionCause optional
+            @RequestParam(required = false) String rejectionCause) {
         Map<String, Object> result = financialStatementService.updateStatus(id, status, rejectionCause);
         return ResponseEntity.ok(result);
     }
