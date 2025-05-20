@@ -89,7 +89,7 @@ public class DmnExecutionController {
             @RequestBody List<RuleDto> rules) {
 
         String xmlContent = dmnXmlGenerationService.generateDmnXmlFromRuleDtoList(rules);
-        dmnRuleImportService.saveNewDmnRule(ruleKey, xmlContent);
+        dmnRuleImportService.saveNewDmnRule(ruleKey, xmlContent, rules);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap("message", "Règle DMN créée et sauvegardée avec succès."));

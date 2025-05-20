@@ -37,7 +37,7 @@ public class DmnXmlGenerationService {
                 .append("             name=\"definitions\"\n")
                 .append("             namespace=\"http://camunda.org/schema/1.0/dmn\">\n\n");
 
-        xml.append("  <decision id=\"decision\" name=\"Validation_Bilan\">\n");
+        xml.append("  <decision id=\"Validation_Bilan\" name=\"Validation_Bilan\">\n");
         xml.append("    <decisionTable id=\"decisionTable\">\n\n");
 
         // Inputs
