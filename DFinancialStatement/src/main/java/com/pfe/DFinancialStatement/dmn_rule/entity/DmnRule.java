@@ -31,4 +31,8 @@ public class DmnRule {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
+
+    @Column(name = "rule_dtos", columnDefinition = "text")
+    private String ruleDtosJson;
+
 }

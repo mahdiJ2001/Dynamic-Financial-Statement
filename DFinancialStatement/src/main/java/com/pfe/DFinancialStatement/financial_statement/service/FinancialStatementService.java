@@ -1,8 +1,11 @@
 package com.pfe.DFinancialStatement.financial_statement.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.pfe.DFinancialStatement.auth.entity.User;
 import com.pfe.DFinancialStatement.auth.service.AuthService;
 import com.pfe.DFinancialStatement.dmn_rule.dto.ExpressionEvaluationResult;
+import com.pfe.DFinancialStatement.dmn_rule.dto.RuleDto;
+import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
 import com.pfe.DFinancialStatement.dmn_rule.service.DmnEvaluationService;
 import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
@@ -10,6 +13,7 @@ import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatement
 import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
 import com.pfe.DFinancialStatement.financial_statement.mapper.FinancialStatementMapper;
 import com.pfe.DFinancialStatement.financial_statement.repository.FinancialStatementRepository;
+import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfe.DFinancialStatement.report_generation.service.ReportGenerationService;
 import org.json.JSONObject;
@@ -36,7 +40,7 @@ public class FinancialStatementService {
     private DmnEvaluationService dmnEvaluationService;
 
     @Autowired
-    private ObjectMapper objectMapper; // For JSON parsing
+    private ObjectMapper objectMapper; 
 
     @Autowired
     private ReportGenerationService reportGenerationService;
@@ -44,11 +48,15 @@ public class FinancialStatementService {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private DmnRuleRepository dmnRuleRepository;
+
 
     public List<ExpressionEvaluationResult> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey, String designName) {
         List<ExpressionEvaluationResult> evaluationResults = new ArrayList<>();
 
         try {
+            // 1. Lecture des données du formulaire
             Map<String, Object> rawData = objectMapper.readValue(dto.getFormData(), Map.class);
             Map<String, Object> inputData = new HashMap<>();
 
@@ -57,19 +65,32 @@ public class FinancialStatementService {
 
             String companyName = (String) rawData.get("companyName");
 
-            evaluationResults = dmnEvaluationService.evaluateDmn(ruleKey, inputData);
+            // 2. Récupérer la règle DMN et la liste des RuleDto depuis la base
+            DmnRule dmnRule = dmnRuleRepository.findByRuleKey(ruleKey)
+                    .orElseThrow(() -> new RuntimeException("Règle DMN introuvable pour le key: " + ruleKey));
+
+            List<RuleDto> allRules = objectMapper.readValue(
+                    dmnRule.getRuleDtosJson(),
+                    new TypeReference<List<RuleDto>>() {}
+            );
+
+            // 3. Évaluation des règles
+            evaluationResults = dmnEvaluationService.evaluateDmn(ruleKey, allRules, inputData);
 
             String evaluationJson = objectMapper.writeValueAsString(evaluationResults);
 
             boolean hasBlockingError = evaluationResults.stream()
                     .anyMatch(result -> "bloquant".equalsIgnoreCase(result.getSeverite()));
 
+            // 4. Si erreur bloquante, retourner directement les résultats sans générer de rapport
             if (hasBlockingError) {
                 return evaluationResults;
             }
 
+            // 5. Génération du rapport
             byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, companyName, designName);
 
+            // 6. Enregistrement du bilan
             FinancialStatement entity = financialStatementMapper.toEntity(dto);
             entity.setReport(reportPdf);
             entity.setCreatedAt(LocalDateTime.now());
@@ -83,11 +104,11 @@ public class FinancialStatementService {
 
         } catch (Exception e) {
             logger.error("Error during financial statement evaluation and saving", e);
-
         }
 
         return evaluationResults;
     }
+
 
 
     private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {

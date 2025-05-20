@@ -40,9 +40,11 @@ public class FinancialStatementController {
         List<ExpressionEvaluationResult> evaluationResults =
                 financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey, designName);
 
+        System.out.println("Résultats d'évaluation : " + evaluationResults);
+
+
         return ResponseEntity.ok(evaluationResults);
     }
-
 
     @PutMapping("/status/{id}")
     public ResponseEntity<Map<String, Object>> updateStatus(

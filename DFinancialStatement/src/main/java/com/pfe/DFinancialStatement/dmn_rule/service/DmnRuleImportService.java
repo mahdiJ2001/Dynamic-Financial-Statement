@@ -1,5 +1,8 @@
 package com.pfe.DFinancialStatement.dmn_rule.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfe.DFinancialStatement.dmn_rule.dto.RuleDto;
 import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
 import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
 import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
@@ -43,16 +46,26 @@ public class DmnRuleImportService {
         return dmnRuleRepository.findByRuleKey(ruleKey).isPresent();
     }
 
-    public DmnRule saveNewDmnRule(String ruleKey, String ruleContent) {
+    public DmnRule saveNewDmnRule(String ruleKey, String ruleContent, List<RuleDto> ruleDtos) {
         if (dmnRuleRepository.findByRuleKey(ruleKey).isPresent()) {
             throw new CustomException("RULE_KEY_EXISTS");
         }
 
-        DmnRule dmnRule = new DmnRule();
-        dmnRule.setRuleKey(ruleKey);
-        dmnRule.setRuleContent(ruleContent);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String ruleDtosJson = objectMapper.writeValueAsString(ruleDtos);
 
-        return dmnRuleRepository.save(dmnRule);
+            DmnRule dmnRule = new DmnRule();
+            dmnRule.setRuleKey(ruleKey);
+            dmnRule.setRuleContent(ruleContent);
+            dmnRule.setRuleDtosJson(ruleDtosJson);
+
+            return dmnRuleRepository.save(dmnRule);
+
+        } catch (JsonProcessingException e) {
+            throw new CustomException("FAILED_TO_SERIALIZE_RULE_DTO");
+        }
     }
+
 
 }
