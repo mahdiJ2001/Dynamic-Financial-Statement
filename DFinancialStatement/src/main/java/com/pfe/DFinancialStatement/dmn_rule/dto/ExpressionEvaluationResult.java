@@ -13,4 +13,5 @@ public class ExpressionEvaluationResult {
     private boolean result;
     private String messageErreur;
     private String severite;
+    private Double evaluatedValue;
 }

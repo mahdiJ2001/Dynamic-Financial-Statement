@@ -44,7 +44,7 @@ public class DmnEvaluationService {
             List<RuleDto> allRules,
             Map<String, Object> inputData
     ) throws JsonProcessingException {
-        // 1) Charger le DMN
+
         DmnRule dmnRule = dmnRuleRepository.findByRuleKey(ruleKey)
                 .orElseThrow();
         String dmnContent = dmnRule.getRuleContent();
@@ -52,23 +52,31 @@ public class DmnEvaluationService {
                 "Validation_Bilan",
                 new ByteArrayInputStream(dmnContent.getBytes(StandardCharsets.UTF_8))
         );
+
         DmnDecisionResult decisionResult = dmnEngine.evaluateDecision(decision, inputData);
 
-        // 2) Extraire les messages d'erreur des règles matchées
-        Set<String> matchedMessages = decisionResult.getResultList().stream()
-                .map(m -> (String) m.get("messageErreur"))
-                .collect(Collectors.toSet());
+        // On crée un map : messageErreur → ligne de résultat complète
+        Map<String, Map<String, Object>> matchedRuleMap = decisionResult.getResultList().stream()
+                .filter(entry -> entry.containsKey("messageErreur"))
+                .collect(Collectors.toMap(
+                        entry -> (String) entry.get("messageErreur"),
+                        entry -> entry
+                ));
 
-        // 3) Construire le résultat complet
         List<ExpressionEvaluationResult> evaluationResults = new ArrayList<>();
         for (RuleDto rule : allRules) {
-            boolean matched = matchedMessages.contains(rule.getMessageErreur());
+            Map<String, Object> matchedRow = matchedRuleMap.get(rule.getMessageErreur());
+            boolean matched = matchedRow != null;
+
+            Double evaluatedValue = matched ? (Double) matchedRow.get("evaluatedValue") : null;
+
             evaluationResults.add(new ExpressionEvaluationResult(
                     rule.getExpression(),
                     rule.getCondition() + rule.getValue(),
                     matched,
                     rule.getMessageErreur(),
-                    rule.getSeverite()
+                    rule.getSeverite(),
+                    evaluatedValue
             ));
         }
 
@@ -76,6 +84,7 @@ public class DmnEvaluationService {
                 objectMapper.writeValueAsString(evaluationResults));
         return evaluationResults;
     }
+
 
 
 }
