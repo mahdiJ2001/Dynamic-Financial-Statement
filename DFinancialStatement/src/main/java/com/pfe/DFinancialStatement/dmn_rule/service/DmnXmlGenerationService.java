@@ -2,6 +2,8 @@ package com.pfe.DFinancialStatement.dmn_rule.service;
 
 import com.pfe.DFinancialStatement.dmn_rule.dto.RuleDto;
 import org.springframework.stereotype.Service;
+import static com.pfe.DFinancialStatement.utils.ExpressionUtils.normalizeExpression;
+
 
 import java.util.*;
 
