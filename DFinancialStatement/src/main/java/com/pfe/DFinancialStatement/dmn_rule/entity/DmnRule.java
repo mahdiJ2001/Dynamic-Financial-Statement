@@ -1,5 +1,7 @@
 package com.pfe.DFinancialStatement.dmn_rule.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pfe.DFinancialStatement.form_template.entity.FormTemplate;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,5 +36,9 @@ public class DmnRule {
 
     @Column(name = "rule_dtos", columnDefinition = "text")
     private String ruleDtosJson;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private FormTemplate formTemplate;
 
 }

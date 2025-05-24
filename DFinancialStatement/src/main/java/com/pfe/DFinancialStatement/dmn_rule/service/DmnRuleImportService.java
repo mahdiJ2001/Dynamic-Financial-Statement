@@ -6,6 +6,9 @@ import com.pfe.DFinancialStatement.dmn_rule.dto.RuleDto;
 import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
 import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
 import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
+import com.pfe.DFinancialStatement.form_template.entity.FormTemplate;
+import com.pfe.DFinancialStatement.form_template.repository.FormTemplateRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +20,9 @@ import java.util.List;
 public class DmnRuleImportService {
 
     private final DmnRuleRepository dmnRuleRepository;
+
+    @Autowired
+    private FormTemplateRepository formTemplateRepository;
 
     public DmnRuleImportService(DmnRuleRepository dmnRuleRepository) {
         this.dmnRuleRepository = dmnRuleRepository;
@@ -42,14 +48,22 @@ public class DmnRuleImportService {
         return dmnRuleRepository.findAll();
     }
 
+    public List<DmnRule> getDmnRulesByTemplateId(Long templateId) {
+        return dmnRuleRepository.findByFormTemplateId(templateId);
+    }
+
+
     public boolean existsByRuleKey(String ruleKey) {
         return dmnRuleRepository.findByRuleKey(ruleKey).isPresent();
     }
 
-    public DmnRule saveNewDmnRule(String ruleKey, String ruleContent, List<RuleDto> ruleDtos) {
+    public DmnRule saveNewDmnRule(Long templateId, String ruleKey, String ruleContent, List<RuleDto> ruleDtos) {
         if (dmnRuleRepository.findByRuleKey(ruleKey).isPresent()) {
             throw new CustomException("RULE_KEY_EXISTS");
         }
+
+        FormTemplate formTemplate = formTemplateRepository.findById(templateId)
+                .orElseThrow(() -> new CustomException("TEMPLATE_NOT_FOUND"));
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -59,6 +73,7 @@ public class DmnRuleImportService {
             dmnRule.setRuleKey(ruleKey);
             dmnRule.setRuleContent(ruleContent);
             dmnRule.setRuleDtosJson(ruleDtosJson);
+            dmnRule.setFormTemplate(formTemplate);
 
             return dmnRuleRepository.save(dmnRule);
 
