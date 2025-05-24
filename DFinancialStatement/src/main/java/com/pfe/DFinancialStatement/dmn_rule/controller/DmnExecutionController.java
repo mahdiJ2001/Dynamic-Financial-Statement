@@ -44,6 +44,13 @@ public class DmnExecutionController {
         return ResponseEntity.ok(dmnRules);
     }
 
+    @GetMapping("/dmn/by-template/{templateId}")
+    public ResponseEntity<List<DmnRule>> getDmnsByTemplateId(@PathVariable Long templateId) {
+        List<DmnRule> rules = dmnRuleImportService.getDmnRulesByTemplateId(templateId);
+        return ResponseEntity.ok(rules);
+    }
+
+
 
     /*
     @PostMapping("/dmn/import")
@@ -85,14 +92,16 @@ public class DmnExecutionController {
 
     @PostMapping("/dmn/create")
     public ResponseEntity<?> createDmnRule(
+            @RequestParam("templateId") Long templateId,
             @RequestParam("ruleKey") String ruleKey,
             @RequestBody List<RuleDto> rules) {
 
         String xmlContent = dmnXmlGenerationService.generateDmnXmlFromRuleDtoList(rules);
-        dmnRuleImportService.saveNewDmnRule(ruleKey, xmlContent, rules);
+        dmnRuleImportService.saveNewDmnRule(templateId, ruleKey, xmlContent, rules);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap("message", "Règle DMN créée et sauvegardée avec succès."));
     }
+
 
 }
