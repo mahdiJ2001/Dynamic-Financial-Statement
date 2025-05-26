@@ -96,12 +96,6 @@
                     <pen lineWidth="0.5" lineColor="#CCCCCC"/>
                 </graphicElement>
             </rectangle>
-            <image>
-                <reportElement x="10" y="10" width="70" height="70" uuid="e81cc0e1-41b1-4e15-ac97-48a8b7672b83">
-                    <printWhenExpression><![CDATA[$P{LOGO} != null]]></printWhenExpression>
-                </reportElement>
-                <imageExpression><![CDATA[$P{LOGO}]]></imageExpression>
-            </image>
             <textField>
                 <reportElement style="Title" x="90" y="20" width="435" height="30" forecolor="#333333" uuid="e81cc0e1-41b1-4e15-ac97-48a8b7672b82"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
