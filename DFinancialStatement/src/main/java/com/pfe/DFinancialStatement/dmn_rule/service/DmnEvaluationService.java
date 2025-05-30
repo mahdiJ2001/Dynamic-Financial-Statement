@@ -17,10 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import static com.pfe.DFinancialStatement.utils.ExpressionUtils.normalizeExpression;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -246,14 +246,20 @@ public class DmnEvaluationService {
     private String normalizeExpression(String input) {
         if (input == null) return "";
 
-        // Split by operators and parentheses while keeping them
-        String[] tokens = input.split("(?=[-+*/<>=()])|(?<=[-+*/<>=()])");
+        // Supprimer les accents
+        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replaceAll("œ", "oe")
+                .replaceAll("æ", "ae");
+
+        // Séparer les opérateurs et parenthèses pour traiter les noms
+        String[] tokens = normalized.split("(?=[-+*/<>=()])|(?<=[-+*/<>=()])");
 
         StringBuilder result = new StringBuilder();
         for (String token : tokens) {
             String trimmed = token.trim();
 
-            // If the token contains spaces and is not just an operator
+            // Si le token est un nom composé avec des espaces : remplace les espaces par _
             if (trimmed.matches("[\\p{L}0-9_]+(\\s+[\\p{L}0-9_]+)+")) {
                 result.append(trimmed.replaceAll("\\s+", "_"));
             } else {

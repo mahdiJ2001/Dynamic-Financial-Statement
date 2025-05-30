@@ -1,5 +1,6 @@
 package com.pfe.DFinancialStatement.financial_statement.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pfe.DFinancialStatement.dmn_rule.dto.ExpressionEvaluationResult;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
 import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
@@ -45,6 +46,19 @@ public class FinancialStatementController {
 
         return ResponseEntity.ok(evaluationResults);
     }
+
+    @PostMapping("/preview")
+    public ResponseEntity<List<ExpressionEvaluationResult>> previewFinancialStatement(
+            @RequestBody FinancialStatementDTO financialStatementDTO,
+            @RequestParam String ruleKey,
+            @RequestParam String designName) throws JsonProcessingException {
+
+        List<ExpressionEvaluationResult> evaluationResults =
+                financialStatementService.evaluateWithoutSaving(financialStatementDTO, ruleKey, designName);
+
+        return ResponseEntity.ok(evaluationResults);
+    }
+
 
     @PutMapping("/status/{id}")
     public ResponseEntity<Map<String, Object>> updateStatus(

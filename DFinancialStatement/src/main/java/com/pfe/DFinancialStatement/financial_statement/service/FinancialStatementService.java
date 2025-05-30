@@ -1,5 +1,6 @@
 package com.pfe.DFinancialStatement.financial_statement.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.pfe.DFinancialStatement.auth.entity.User;
 import com.pfe.DFinancialStatement.auth.service.AuthService;
@@ -21,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.text.Normalizer;
 import java.util.*;
@@ -56,7 +59,10 @@ public class FinancialStatementService {
         List<ExpressionEvaluationResult> evaluationResults = new ArrayList<>();
 
         try {
+            logger.info("Début de l'évaluation et sauvegarde du bilan financier.");
+
             // 1. Lecture des données du formulaire
+            logger.info("Lecture des données du formulaire...");
             Map<String, Object> rawData = objectMapper.readValue(dto.getFormData(), Map.class);
             Map<String, Object> inputData = new HashMap<>();
 
@@ -64,49 +70,98 @@ public class FinancialStatementService {
             extractFields(rawData, "passif", inputData);
 
             String companyName = (String) rawData.get("companyName");
+            logger.info("Nom de la société extrait: {}", companyName);
 
             // 2. Récupérer la règle DMN et la liste des RuleDto depuis la base
+            logger.info("Recherche de la règle DMN avec la clé: {}", ruleKey);
             DmnRule dmnRule = dmnRuleRepository.findByRuleKey(ruleKey)
-                    .orElseThrow(() -> new RuntimeException("Règle DMN introuvable pour le key: " + ruleKey));
+                    .orElseThrow(() -> new RuntimeException("Règle DMN introuvable pour la clé: " + ruleKey));
 
             List<RuleDto> allRules = objectMapper.readValue(
                     dmnRule.getRuleDtosJson(),
                     new TypeReference<List<RuleDto>>() {}
             );
+            logger.info("Nombre de règles DMN chargées: {}", allRules.size());
 
             // 3. Évaluation des règles
+            logger.info("Évaluation des règles DMN...");
             evaluationResults = dmnEvaluationService.evaluateDmn(ruleKey, allRules, inputData);
+            logger.info("Évaluation terminée, {} résultats obtenus.", evaluationResults.size());
 
             String evaluationJson = objectMapper.writeValueAsString(evaluationResults);
 
             boolean hasBlockingError = evaluationResults.stream()
-                    .anyMatch(result -> "bloquant".equalsIgnoreCase(result.getSeverite()));
+                    .filter(result -> {
+                        String sev = result.getSeverite().toLowerCase();
+                        return sev.equals("bloquant") || sev.equals("blocking");
+                    })
+                    .anyMatch(result -> Boolean.TRUE.equals(result.isResult()));
+
+            logger.info("Présence d'erreur bloquante ? {}", hasBlockingError);
+
 
             // 4. Si erreur bloquante, retourner directement les résultats sans générer de rapport
             if (hasBlockingError) {
+                logger.warn("Erreurs bloquantes détectées, arrêt de la sauvegarde.");
                 return evaluationResults;
             }
 
             // 5. Génération du rapport
+            logger.info("Génération du rapport financier en PDF...");
             byte[] reportPdf = reportGenerationService.generateFinancialReport(rawData, companyName, designName);
+            logger.info("Rapport généré, taille (bytes): {}", reportPdf.length);
 
             // 6. Enregistrement du bilan
+            logger.info("Mapping du DTO vers l'entité FinancialStatement...");
             FinancialStatement entity = financialStatementMapper.toEntity(dto);
+
             entity.setReport(reportPdf);
             entity.setCreatedAt(LocalDateTime.now());
             entity.setCompanyName(companyName);
             entity.setEvaluationResult(evaluationJson);
 
             User currentUser = authService.getCurrentUser();
+            logger.info("Utilisateur courant récupéré: {}", currentUser.getUsername());
             entity.setCreatedBy(currentUser);
 
+            logger.info("Sauvegarde de l'entité FinancialStatement en base...");
             financialStatementRepository.save(entity);
+            logger.info("Sauvegarde réussie.");
 
         } catch (Exception e) {
-            logger.error("Error during financial statement evaluation and saving", e);
+            logger.error("Erreur lors de l'évaluation et sauvegarde du bilan financier", e);
+            throw new RuntimeException("Erreur lors de l'évaluation et sauvegarde du bilan financier", e);
         }
 
         return evaluationResults;
+    }
+
+    public List<ExpressionEvaluationResult> evaluateWithoutSaving(FinancialStatementDTO dto, String ruleKey, String designName) throws JsonProcessingException {
+        logger.info("Début de la prévisualisation du bilan financier sans sauvegarde.");
+
+        Map<String, Object> rawData;
+        try {
+            rawData = objectMapper.readValue(dto.getFormData(), Map.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors de la lecture des données du formulaire", e);
+        }
+
+        Map<String, Object> inputData = new HashMap<>();
+        extractFields(rawData, "actif", inputData);
+        extractFields(rawData, "passif", inputData);
+
+        DmnRule dmnRule = dmnRuleRepository.findByRuleKey(ruleKey)
+                .orElseThrow(() -> new RuntimeException("Règle DMN introuvable pour la clé: " + ruleKey));
+
+        List<RuleDto> allRules;
+        try {
+            allRules = objectMapper.readValue(dmnRule.getRuleDtosJson(), new TypeReference<List<RuleDto>>() {});
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur lors de la lecture des règles DMN", e);
+        }
+
+        return dmnEvaluationService.evaluateDmn(ruleKey, allRules, inputData);
+
     }
 
 

@@ -2,9 +2,9 @@ package com.pfe.DFinancialStatement.dmn_rule.service;
 
 import com.pfe.DFinancialStatement.dmn_rule.dto.RuleDto;
 import org.springframework.stereotype.Service;
-import static com.pfe.DFinancialStatement.utils.ExpressionUtils.normalizeExpression;
 
 
+import java.text.Normalizer;
 import java.util.*;
 
 @Service
@@ -107,14 +107,20 @@ public class DmnXmlGenerationService {
     private String normalizeExpression(String input) {
         if (input == null) return "";
 
-        // Séparer les opérateurs et parenthèses pour les identifier individuellement
-        String[] tokens = input.split("(?=[-+*/<>=()])|(?<=[-+*/<>=()])");
+        // Supprimer les accents
+        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                .replaceAll("œ", "oe")
+                .replaceAll("æ", "ae");
+
+        // Séparer les opérateurs et parenthèses pour traiter les noms
+        String[] tokens = normalized.split("(?=[-+*/<>=()])|(?<=[-+*/<>=()])");
 
         StringBuilder result = new StringBuilder();
         for (String token : tokens) {
             String trimmed = token.trim();
 
-            // Si le token est un mot ou une suite de mots (e.g. "Dettes fournisseurs")
+            // Si le token est un nom composé avec des espaces : remplace les espaces par _
             if (trimmed.matches("[\\p{L}0-9_]+(\\s+[\\p{L}0-9_]+)+")) {
                 result.append(trimmed.replaceAll("\\s+", "_"));
             } else {
