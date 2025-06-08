@@ -11,6 +11,7 @@ import com.pfe.DFinancialStatement.dmn_rule.service.DmnEvaluationService;
 import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
 import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatement;
+import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatementMessage;
 import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
 import com.pfe.DFinancialStatement.financial_statement.mapper.FinancialStatementMapper;
 import com.pfe.DFinancialStatement.financial_statement.repository.FinancialStatementRepository;
@@ -163,7 +164,50 @@ public class FinancialStatementService {
         return dmnEvaluationService.evaluateDmn(ruleKey, allRules, inputData);
 
     }
+    
+    public List<FinancialStatementDTO> getAllFinancialStatements() {
+        List<FinancialStatement> entities = financialStatementRepository.findAll();
+        return entities.stream().map(financialStatementMapper::toDTO).toList();
+    }
 
+    public Optional<FinancialStatementDTO> getFinancialStatementById(Long id) {
+        return financialStatementRepository.findById(id).map(financialStatementMapper::toDTO);
+    }
+
+    public Map<String, Object> updateStatus(Long id, String status, String rejectionCause) {
+        try {
+            StatementStatus statementStatus = StatementStatus.valueOf(status.toUpperCase());
+            Optional<FinancialStatement> financialStatementOpt = financialStatementRepository.findById(id);
+
+            if (financialStatementOpt.isPresent()) {
+                FinancialStatement financialStatement = financialStatementOpt.get();
+                financialStatement.setStatus(statementStatus);
+
+                // If REJECTED and rejectionCause is provided, add a new message entity
+                if (statementStatus == StatementStatus.REJECTED && rejectionCause != null && !rejectionCause.isBlank()) {
+                    FinancialStatementMessage message = new FinancialStatementMessage();
+                    message.setFinancialStatement(financialStatement);
+                    message.setMessageContent(rejectionCause);
+
+                    financialStatement.getMessages().add(message);
+                }
+
+                financialStatementRepository.save(financialStatement);
+
+                Map<String, Object> result = new HashMap<>();
+                result.put("status", "success");
+                result.put("message", "Financial statement status updated successfully.");
+                return result;
+            } else {
+                throw new CustomException("Financial statement not found.");
+            }
+        } catch (IllegalArgumentException e) {
+            throw new CustomException("Invalid status value provided.");
+        } catch (Exception e) {
+            logger.error("Error updating financial statement status", e);
+            throw new CustomException("Error updating status: " + e.getMessage());
+        }
+    }
 
 
     private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {
@@ -208,50 +252,6 @@ public class FinancialStatementService {
         }
     }
 
-    public List<FinancialStatementDTO> getAllFinancialStatements() {
-        List<FinancialStatement> entities = financialStatementRepository.findAll();
-        return entities.stream().map(financialStatementMapper::toDTO).toList();
-    }
-
-    public Optional<FinancialStatementDTO> getFinancialStatementById(Long id) {
-        return financialStatementRepository.findById(id).map(financialStatementMapper::toDTO);
-    }
-
-    public Map<String, Object> updateStatus(Long id, String status, String rejectionCause) {
-        try {
-            // Convert the status string to a StatementStatus enum
-            StatementStatus statementStatus = StatementStatus.valueOf(status.toUpperCase());
-
-            // Fetch the financial statement by ID
-            Optional<FinancialStatement> financialStatementOpt = financialStatementRepository.findById(id);
-
-            if (financialStatementOpt.isPresent()) {
-                FinancialStatement financialStatement = financialStatementOpt.get();
-                financialStatement.setStatus(statementStatus);
-
-                // If the status is REJECTED, set the rejection cause
-                if (statementStatus == StatementStatus.REJECTED && rejectionCause != null) {
-                    financialStatement.setRejectionCause(rejectionCause);
-                }
-
-                // Save the updated financial statement
-                financialStatementRepository.save(financialStatement);
-
-                // Prepare and return the success response
-                Map<String, Object> result = new HashMap<>();
-                result.put("status", "success");
-                result.put("message", "Financial statement status updated successfully.");
-                return result;
-            } else {
-                throw new CustomException("Financial statement not found.");
-            }
-        } catch (IllegalArgumentException e) {
-            throw new CustomException("Invalid status value provided.");
-        } catch (Exception e) {
-            logger.error("Error updating financial statement status", e);
-            throw new CustomException("Error updating status: " + e.getMessage());
-        }
-    }
 
 
 }

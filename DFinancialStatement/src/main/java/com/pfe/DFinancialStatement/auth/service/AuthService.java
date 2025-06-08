@@ -35,7 +35,7 @@ public class AuthService {
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             if (passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-                String token = jwtUtil.generateToken(user.getUsername(), user.getEmail(), user.getRole().toString());
+                String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getEmail(), user.getRole().toString());
                 return Optional.of(token);
             }
         }
