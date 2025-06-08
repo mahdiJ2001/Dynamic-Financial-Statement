@@ -52,7 +52,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
             return userRepository.save(newUser);
         });
 
-        String token = jwtUtil.generateToken(user.getUsername(), user.getEmail(), user.getRole().name());
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getEmail(), user.getRole().name());
         System.out.println("Generated JWT token");
 
         // Method 1: Use a cookie for token storage - more secure

@@ -1,5 +1,6 @@
 package com.pfe.DFinancialStatement.financial_statement.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pfe.DFinancialStatement.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,7 +21,9 @@ public class FinancialStatementMessage {
 
     @ManyToOne
     @JoinColumn(name = "financial_statement_id", nullable = false)
+    @JsonIgnore
     private FinancialStatement financialStatement;
+
 
     @ManyToOne
     @JoinColumn(name = "sender_id", nullable = false)

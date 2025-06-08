@@ -23,9 +23,10 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String username, String email, String role) {
+    public String generateToken(Long userId,String username, String email, String role) {
         return Jwts.builder()
                 .subject(email)
+                .claim("userId", userId)
                 .claim("username", username)
                 .claim("email", email)
                 .claim("role", role)

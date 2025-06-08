@@ -15,7 +15,7 @@ public class FinancialStatementDTO {
     private LocalDateTime createdAt;
     private String contributorName;
     private StatementStatus status;
-    private String rejectionCause;
+    private List<FinancialStatementMessageDTO> messages;
     private String companyName;
     private List<ExpressionEvaluationResult> evaluationResults;
 }

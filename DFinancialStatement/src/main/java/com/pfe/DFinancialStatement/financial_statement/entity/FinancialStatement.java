@@ -1,5 +1,6 @@
 package com.pfe.DFinancialStatement.financial_statement.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.pfe.DFinancialStatement.auth.entity.User;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -27,8 +28,10 @@ public class FinancialStatement {
     private String formData;
 
     @Lob
+    @Basic(fetch = FetchType.LAZY)
     @Column(name = "report")
     private byte[] report;
+
 
     @Column(name = "company_name")
     private String companyName;
@@ -48,6 +51,8 @@ public class FinancialStatement {
     private String evaluationResult;
 
     @OneToMany(mappedBy = "financialStatement", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<FinancialStatementMessage> messages = new ArrayList<>();
+
 
 }

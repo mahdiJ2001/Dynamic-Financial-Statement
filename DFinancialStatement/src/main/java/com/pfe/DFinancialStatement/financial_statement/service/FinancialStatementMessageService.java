@@ -6,6 +6,7 @@ import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatement
 import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatementMessage;
 import com.pfe.DFinancialStatement.financial_statement.repository.FinancialStatementMessageRepository;
 import com.pfe.DFinancialStatement.financial_statement.repository.FinancialStatementRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +25,12 @@ public class FinancialStatementMessageService {
     @Autowired
     private UserService userService;
 
+    @Transactional
     public List<FinancialStatementMessage> getMessagesByFinancialStatementId(Long financialStatementId) {
         return messageRepository.findByFinancialStatementIdOrderBySentAtAsc(financialStatementId);
     }
 
+    @Transactional
     public FinancialStatementMessage addMessage(Long financialStatementId, Long senderId, String content) {
         FinancialStatement fs = financialStatementRepository.findById(financialStatementId)
                 .orElseThrow(() -> new RuntimeException("FinancialStatement not found with id: " + financialStatementId));

@@ -164,51 +164,7 @@ public class FinancialStatementService {
         return dmnEvaluationService.evaluateDmn(ruleKey, allRules, inputData);
 
     }
-
-
-
-    private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {
-        Object sectionData = rawData.get(section);
-        if (sectionData instanceof List) {
-            List<?> groupList = (List<?>) sectionData;
-            for (Object groupObj : groupList) {
-                if (groupObj instanceof Map) {
-                    Map<?, ?> group = (Map<?, ?>) groupObj;
-                    if (group.containsKey("fields") && group.get("fields") instanceof List) {
-                        List<?> fields = (List<?>) group.get("fields");
-                        for (Object fieldObj : fields) {
-                            if (fieldObj instanceof Map) {
-                                Map<?, ?> field = (Map<?, ?>) fieldObj;
-                                Object labelObj = field.get("label");
-                                Object fieldValue = field.get("value");
-
-                                // Process key to remove accents and spaces
-                                if (labelObj != null) {
-                                    String label = labelObj.toString();
-                                    // Normalize and remove accents
-                                    String key = Normalizer.normalize(label, Normalizer.Form.NFD)
-                                            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
-                                            .replaceAll("œ", "oe")
-                                            .replaceAll("æ", "ae")
-                                            .replaceAll(" +", "_");
-
-                                    // Convert value to number if possible
-                                    if (fieldValue instanceof String) {
-                                        try {
-                                            fieldValue = Double.parseDouble((String) fieldValue);
-                                        } catch (NumberFormatException e) {
-                                        }
-                                    }
-                                    inputData.put(key, fieldValue);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
+    
     public List<FinancialStatementDTO> getAllFinancialStatements() {
         List<FinancialStatement> entities = financialStatementRepository.findAll();
         return entities.stream().map(financialStatementMapper::toDTO).toList();
@@ -250,6 +206,49 @@ public class FinancialStatementService {
         } catch (Exception e) {
             logger.error("Error updating financial statement status", e);
             throw new CustomException("Error updating status: " + e.getMessage());
+        }
+    }
+
+
+    private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {
+        Object sectionData = rawData.get(section);
+        if (sectionData instanceof List) {
+            List<?> groupList = (List<?>) sectionData;
+            for (Object groupObj : groupList) {
+                if (groupObj instanceof Map) {
+                    Map<?, ?> group = (Map<?, ?>) groupObj;
+                    if (group.containsKey("fields") && group.get("fields") instanceof List) {
+                        List<?> fields = (List<?>) group.get("fields");
+                        for (Object fieldObj : fields) {
+                            if (fieldObj instanceof Map) {
+                                Map<?, ?> field = (Map<?, ?>) fieldObj;
+                                Object labelObj = field.get("label");
+                                Object fieldValue = field.get("value");
+
+                                // Process key to remove accents and spaces
+                                if (labelObj != null) {
+                                    String label = labelObj.toString();
+                                    // Normalize and remove accents
+                                    String key = Normalizer.normalize(label, Normalizer.Form.NFD)
+                                            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+                                            .replaceAll("œ", "oe")
+                                            .replaceAll("æ", "ae")
+                                            .replaceAll(" +", "_");
+
+                                    // Convert value to number if possible
+                                    if (fieldValue instanceof String) {
+                                        try {
+                                            fieldValue = Double.parseDouble((String) fieldValue);
+                                        } catch (NumberFormatException e) {
+                                        }
+                                    }
+                                    inputData.put(key, fieldValue);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

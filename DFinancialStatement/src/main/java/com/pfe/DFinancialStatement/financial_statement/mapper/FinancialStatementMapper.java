@@ -8,6 +8,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class FinancialStatementMapper {
 
+    private final FinancialStatementMessageMapper messageMapper;
+
+    public FinancialStatementMapper(FinancialStatementMessageMapper messageMapper) {
+        this.messageMapper = messageMapper;
+    }
+
     public FinancialStatement toEntity(FinancialStatementDTO dto) {
         FinancialStatement entity = new FinancialStatement();
         entity.setId(dto.getId());
@@ -15,7 +21,6 @@ public class FinancialStatementMapper {
         entity.setReport(dto.getReport());
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setStatus(dto.getStatus() != null ? dto.getStatus() : StatementStatus.PENDING);
-        entity.setRejectionCause(dto.getRejectionCause());
         entity.setCompanyName(dto.getCompanyName());
         return entity;
     }
@@ -27,13 +32,17 @@ public class FinancialStatementMapper {
         dto.setReport(entity.getReport());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setStatus(entity.getStatus());
-        dto.setRejectionCause(entity.getRejectionCause());
         dto.setCompanyName(entity.getCompanyName());
         if (entity.getCreatedBy() != null) {
             dto.setContributorName(entity.getCreatedBy().getUsername());
         }
+        if (entity.getMessages() != null) {
+            dto.setMessages(entity.getMessages().stream()
+                    .map(messageMapper::toDTO)
+                    .toList());
+        }
         return dto;
     }
-
 }
+
 
