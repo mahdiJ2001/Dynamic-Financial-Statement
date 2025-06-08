@@ -11,6 +11,7 @@ import com.pfe.DFinancialStatement.dmn_rule.service.DmnEvaluationService;
 import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
 import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatement;
+import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatementMessage;
 import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
 import com.pfe.DFinancialStatement.financial_statement.mapper.FinancialStatementMapper;
 import com.pfe.DFinancialStatement.financial_statement.repository.FinancialStatementRepository;
@@ -219,25 +220,24 @@ public class FinancialStatementService {
 
     public Map<String, Object> updateStatus(Long id, String status, String rejectionCause) {
         try {
-            // Convert the status string to a StatementStatus enum
             StatementStatus statementStatus = StatementStatus.valueOf(status.toUpperCase());
-
-            // Fetch the financial statement by ID
             Optional<FinancialStatement> financialStatementOpt = financialStatementRepository.findById(id);
 
             if (financialStatementOpt.isPresent()) {
                 FinancialStatement financialStatement = financialStatementOpt.get();
                 financialStatement.setStatus(statementStatus);
 
-                // If the status is REJECTED, set the rejection cause
-                if (statementStatus == StatementStatus.REJECTED && rejectionCause != null) {
-                    financialStatement.setRejectionCause(rejectionCause);
+                // If REJECTED and rejectionCause is provided, add a new message entity
+                if (statementStatus == StatementStatus.REJECTED && rejectionCause != null && !rejectionCause.isBlank()) {
+                    FinancialStatementMessage message = new FinancialStatementMessage();
+                    message.setFinancialStatement(financialStatement);
+                    message.setMessageContent(rejectionCause);
+
+                    financialStatement.getMessages().add(message);
                 }
 
-                // Save the updated financial statement
                 financialStatementRepository.save(financialStatement);
 
-                // Prepare and return the success response
                 Map<String, Object> result = new HashMap<>();
                 result.put("status", "success");
                 result.put("message", "Financial statement status updated successfully.");
@@ -252,6 +252,7 @@ public class FinancialStatementService {
             throw new CustomException("Error updating status: " + e.getMessage());
         }
     }
+
 
 
 }

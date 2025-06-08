@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
 
 @Entity
@@ -41,10 +44,10 @@ public class FinancialStatement {
     @Column(name = "status", nullable = false)
     private StatementStatus status = StatementStatus.PENDING;
 
-    @Column(name = "rejection_cause")
-    private String rejectionCause;
-
     @Column(name = "evaluation_result", columnDefinition = "TEXT")
     private String evaluationResult;
+
+    @OneToMany(mappedBy = "financialStatement", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FinancialStatementMessage> messages = new ArrayList<>();
 
 }

@@ -3,7 +3,9 @@ package com.pfe.DFinancialStatement.financial_statement.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pfe.DFinancialStatement.dmn_rule.dto.ExpressionEvaluationResult;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
+import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatementMessage;
 import com.pfe.DFinancialStatement.financial_statement.entity.StatementStatus;
+import com.pfe.DFinancialStatement.financial_statement.service.FinancialStatementMessageService;
 import com.pfe.DFinancialStatement.financial_statement.service.FinancialStatementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,9 @@ public class FinancialStatementController {
 
     @Autowired
     private FinancialStatementService financialStatementService;
+
+    @Autowired
+    private FinancialStatementMessageService messageService;
 
     @GetMapping
     public ResponseEntity<List<FinancialStatementDTO>> getAllFinancialStatements() {
@@ -67,6 +72,22 @@ public class FinancialStatementController {
             @RequestParam(required = false) String rejectionCause) {
         Map<String, Object> result = financialStatementService.updateStatus(id, status, rejectionCause);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{id}/messages")
+    public ResponseEntity<List<FinancialStatementMessage>> getMessages(@PathVariable Long id) {
+        List<FinancialStatementMessage> messages = messageService.getMessagesByFinancialStatementId(id);
+        return ResponseEntity.ok(messages);
+    }
+
+    @PostMapping("/{id}/messages")
+    public ResponseEntity<FinancialStatementMessage> addMessage(
+            @PathVariable Long id,
+            @RequestParam Long senderId,
+            @RequestBody String content) {
+
+        FinancialStatementMessage message = messageService.addMessage(id, senderId, content);
+        return ResponseEntity.ok(message);
     }
 
 }
