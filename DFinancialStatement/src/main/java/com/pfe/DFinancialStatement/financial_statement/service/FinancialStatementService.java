@@ -17,6 +17,7 @@ import com.pfe.DFinancialStatement.financial_statement.mapper.FinancialStatement
 import com.pfe.DFinancialStatement.financial_statement.repository.FinancialStatementRepository;
 import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfe.DFinancialStatement.notification.service.NotificationService;
 import com.pfe.DFinancialStatement.report_generation.service.ReportGenerationService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -54,6 +55,10 @@ public class FinancialStatementService {
 
     @Autowired
     private DmnRuleRepository dmnRuleRepository;
+
+    @Autowired
+    private NotificationService notificationService;
+
 
 
     public List<ExpressionEvaluationResult> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey, String designName) {
@@ -183,13 +188,23 @@ public class FinancialStatementService {
                 FinancialStatement financialStatement = financialStatementOpt.get();
                 financialStatement.setStatus(statementStatus);
 
+                // Notification target
+                User user = financialStatement.getCreatedBy();
+
                 // If REJECTED and rejectionCause is provided, add a new message entity
                 if (statementStatus == StatementStatus.REJECTED && rejectionCause != null && !rejectionCause.isBlank()) {
                     FinancialStatementMessage message = new FinancialStatementMessage();
                     message.setFinancialStatement(financialStatement);
                     message.setMessageContent(rejectionCause);
-
                     financialStatement.getMessages().add(message);
+
+                    // Send rejection notification
+                    String msg = "Votre bilan \"" + financialStatement.getCompanyName() + "\" a été rejeté. Motif : " + rejectionCause;
+                    notificationService.createNotification(user, msg);
+                } else if (statementStatus == StatementStatus.VALIDATED) {
+                    // Send validation notification
+                    String msg = "Votre bilan \"" + financialStatement.getCompanyName() + "\" a été validé.";
+                    notificationService.createNotification(user, msg);
                 }
 
                 financialStatementRepository.save(financialStatement);
