@@ -18,7 +18,7 @@ public class NotificationService {
     private EmailService emailService;
 
     public void createNotification(User user, String message) {
-        // Save notification in database
+
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setMessage(message);
