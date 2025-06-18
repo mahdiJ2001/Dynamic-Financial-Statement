@@ -14,11 +14,21 @@ public class NotificationService {
     @Autowired
     private NotificationRepository notificationRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     public void createNotification(User user, String message) {
+        // Save notification in database
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setMessage(message);
         notificationRepository.save(notification);
+
+        // Send email to user
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            String subject = "Notification - État de votre bilan";
+            emailService.sendEmail(user.getEmail(), subject, message);
+        }
     }
 
     public List<Notification> getUnreadNotifications(User user) {
