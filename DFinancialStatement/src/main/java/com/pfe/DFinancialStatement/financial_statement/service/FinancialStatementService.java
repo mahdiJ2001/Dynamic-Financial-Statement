@@ -191,16 +191,12 @@ public class FinancialStatementService {
                 // Notification target
                 User user = financialStatement.getCreatedBy();
 
-                // If REJECTED and rejectionCause is provided, add a new message entity
-                if (statementStatus == StatementStatus.REJECTED && rejectionCause != null && !rejectionCause.isBlank()) {
-                    FinancialStatementMessage message = new FinancialStatementMessage();
-                    message.setFinancialStatement(financialStatement);
-                    message.setMessageContent(rejectionCause);
-                    financialStatement.getMessages().add(message);
-
+                // If REJECTED
+                if (statementStatus == StatementStatus.REJECTED ) {
                     // Send rejection notification
-                    String msg = "Votre bilan \"" + financialStatement.getCompanyName() + "\" a été rejeté. Motif : " + rejectionCause;
+                    String msg = "Votre bilan \"" + financialStatement.getCompanyName() + "\" a été rejeté.";
                     notificationService.createNotification(user, msg);
+
                 } else if (statementStatus == StatementStatus.VALIDATED) {
                     // Send validation notification
                     String msg = "Votre bilan \"" + financialStatement.getCompanyName() + "\" a été validé.";
