@@ -150,10 +150,10 @@ public class DmnEvaluationService {
             Map<String, Object> matchedRow = matchedRuleMap.get(rule.getMessageErreur());
             boolean matched = matchedRow != null;
 
-            // Get evaluated value for this rule's expression
+
             Double evaluatedValue = expressionToValue.get(rule.getExpression());
 
-            // If not found, try with normalized expression
+
             if (evaluatedValue == null) {
                 String normalizedExpr = normalizeExpression(rule.getExpression());
                 evaluatedValue = expressionToValue.get(normalizedExpr);
