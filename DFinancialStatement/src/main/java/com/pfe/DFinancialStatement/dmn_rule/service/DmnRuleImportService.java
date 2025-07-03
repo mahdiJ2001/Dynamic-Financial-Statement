@@ -2,6 +2,10 @@ package com.pfe.DFinancialStatement.dmn_rule.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfe.DFinancialStatement.activity.enums.ActionType;
+import com.pfe.DFinancialStatement.activity.service.ActivityLogService;
+import com.pfe.DFinancialStatement.auth.entity.User;
+import com.pfe.DFinancialStatement.auth.service.AuthService;
 import com.pfe.DFinancialStatement.dmn_rule.dto.RuleDto;
 import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
 import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
@@ -23,6 +27,12 @@ public class DmnRuleImportService {
 
     @Autowired
     private FormTemplateRepository formTemplateRepository;
+
+    @Autowired
+    private ActivityLogService activityLogService;
+
+    @Autowired
+    private AuthService authService;
 
     public DmnRuleImportService(DmnRuleRepository dmnRuleRepository) {
         this.dmnRuleRepository = dmnRuleRepository;
@@ -75,12 +85,21 @@ public class DmnRuleImportService {
             dmnRule.setRuleDtosJson(ruleDtosJson);
             dmnRule.setFormTemplate(formTemplate);
 
-            return dmnRuleRepository.save(dmnRule);
+            DmnRule savedRule = dmnRuleRepository.save(dmnRule);
+
+            User currentUser = authService.getCurrentUser();
+            activityLogService.log(
+                    ActionType.CREATE_VALIDATION_MODEL,
+                    "User " + currentUser.getUsername() + " created validation model with ruleKey: " + ruleKey
+            );
+
+            return savedRule;
 
         } catch (JsonProcessingException e) {
             throw new CustomException("FAILED_TO_SERIALIZE_RULE_DTO");
         }
     }
+
 
 
 }

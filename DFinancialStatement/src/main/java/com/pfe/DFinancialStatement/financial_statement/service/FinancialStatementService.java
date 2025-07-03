@@ -2,6 +2,8 @@ package com.pfe.DFinancialStatement.financial_statement.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.pfe.DFinancialStatement.activity.enums.ActionType;
+import com.pfe.DFinancialStatement.activity.service.ActivityLogService;
 import com.pfe.DFinancialStatement.auth.entity.User;
 import com.pfe.DFinancialStatement.auth.service.AuthService;
 import com.pfe.DFinancialStatement.dmn_rule.dto.ExpressionEvaluationResult;
@@ -58,6 +60,9 @@ public class FinancialStatementService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private ActivityLogService activityLogService;
 
 
 
@@ -134,6 +139,12 @@ public class FinancialStatementService {
             financialStatementRepository.save(entity);
             logger.info("Sauvegarde réussie.");
 
+
+            activityLogService.log(
+                    ActionType.SUBMIT_REPORT,
+                    "User " + currentUser.getUsername() + " submitted report for company: " + companyName
+            );
+
         } catch (Exception e) {
             logger.error("Erreur lors de l'évaluation et sauvegarde du bilan financier", e);
             throw new RuntimeException("Erreur lors de l'évaluation et sauvegarde du bilan financier", e);
@@ -191,16 +202,28 @@ public class FinancialStatementService {
                 // Notification target
                 User user = financialStatement.getCreatedBy();
 
-                // If REJECTED
+                // Log current user performing this action
+                User currentUser = authService.getCurrentUser();
+
                 if (statementStatus == StatementStatus.REJECTED ) {
                     // Send rejection notification
                     String msg = "Votre bilan \"" + financialStatement.getCompanyName() + "\" a été rejeté.";
                     notificationService.createNotification(user, msg);
 
+                    activityLogService.log(
+                            ActionType.REJECT_REPORT,
+                            "User " + currentUser.getUsername() + " rejected report for company: " + financialStatement.getCompanyName()
+                    );
+
                 } else if (statementStatus == StatementStatus.VALIDATED) {
                     // Send validation notification
                     String msg = "Votre bilan \"" + financialStatement.getCompanyName() + "\" a été validé.";
                     notificationService.createNotification(user, msg);
+
+                    activityLogService.log(
+                            ActionType.VALIDATE_REPORT,
+                            "User " + currentUser.getUsername() + " validated report for company: " + financialStatement.getCompanyName()
+                    );
                 }
 
                 financialStatementRepository.save(financialStatement);
