@@ -1,11 +1,13 @@
 package com.pfe.DFinancialStatement.notification.entity;
 
 import com.pfe.DFinancialStatement.auth.entity.User;
+import com.pfe.DFinancialStatement.common.MapToJsonConverter;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
 @Table(name = "notifications")
@@ -17,7 +19,11 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String message;
+    private String messageKey;
+
+    @Convert(converter = MapToJsonConverter.class)
+    @Column(columnDefinition = "TEXT")
+    private Map<String, String> params;
 
     private boolean isRead = false;
 

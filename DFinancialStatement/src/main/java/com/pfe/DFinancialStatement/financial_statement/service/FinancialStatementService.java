@@ -142,7 +142,8 @@ public class FinancialStatementService {
 
             activityLogService.log(
                     ActionType.SUBMIT_REPORT,
-                    "User " + currentUser.getUsername() + " submitted report for company: " + companyName
+                    "REPORT_SUBMITTED",
+                    Map.of("username", currentUser.getUsername(), "companyName", companyName)
             );
 
         } catch (Exception e) {
@@ -199,30 +200,40 @@ public class FinancialStatementService {
                 FinancialStatement financialStatement = financialStatementOpt.get();
                 financialStatement.setStatus(statementStatus);
 
-                // Notification target
                 User user = financialStatement.getCreatedBy();
-
-                // Log current user performing this action
                 User currentUser = authService.getCurrentUser();
 
-                if (statementStatus == StatementStatus.REJECTED ) {
-                    // Send rejection notification
-                    String msg = "Votre bilan \"" + financialStatement.getCompanyName() + "\" a été rejeté.";
-                    notificationService.createNotification(user, msg);
+                if (statementStatus == StatementStatus.REJECTED) {
+
+                    notificationService.createNotification(
+                            user,
+                            "REPORT_REJECTED",
+                            Map.of("companyName", financialStatement.getCompanyName())
+                    );
 
                     activityLogService.log(
                             ActionType.REJECT_REPORT,
-                            "User " + currentUser.getUsername() + " rejected report for company: " + financialStatement.getCompanyName()
+                            "REPORT_REJECTED_LOG",
+                            Map.of(
+                                    "username", currentUser.getUsername(),
+                                    "companyName", financialStatement.getCompanyName()
+                            )
                     );
 
                 } else if (statementStatus == StatementStatus.VALIDATED) {
-                    // Send validation notification
-                    String msg = "Votre bilan \"" + financialStatement.getCompanyName() + "\" a été validé.";
-                    notificationService.createNotification(user, msg);
+                    notificationService.createNotification(
+                            user,
+                            "REPORT_VALIDATED",
+                            Map.of("companyName", financialStatement.getCompanyName())
+                    );
 
                     activityLogService.log(
                             ActionType.VALIDATE_REPORT,
-                            "User " + currentUser.getUsername() + " validated report for company: " + financialStatement.getCompanyName()
+                            "REPORT_VALIDATED_LOG",
+                            Map.of(
+                                    "username", currentUser.getUsername(),
+                                    "companyName", financialStatement.getCompanyName()
+                            )
                     );
                 }
 
@@ -242,6 +253,7 @@ public class FinancialStatementService {
             throw new CustomException("Error updating status: " + e.getMessage());
         }
     }
+
 
 
     private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {

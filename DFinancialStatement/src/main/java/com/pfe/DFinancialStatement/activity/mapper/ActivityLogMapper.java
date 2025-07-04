@@ -8,11 +8,25 @@ import org.springframework.stereotype.Component;
 public class ActivityLogMapper {
 
     public ActivityLogDTO toDTO(ActivityLog log) {
+        if (log == null) return null;
+
         ActivityLogDTO dto = new ActivityLogDTO();
-        dto.setUsername(log.getUser().getUsername());
-        dto.setActionType(log.getActionType());
-        dto.setDescription(log.getDescription());
-        dto.setTimestamp(log.getTimestamp());
+        dto.setId(log.getId());
+        dto.setActionType(log.getActionType().name());
+        dto.setMessageKey(log.getMessageKey());
+        dto.setParams(log.getParams());
+        dto.setTimestamp(log.getTimestamp().toString());
+
+        if (log.getUser() != null) {
+            ActivityLogDTO.UserDTO userDto = new ActivityLogDTO.UserDTO();
+            userDto.setId(log.getUser().getId());
+            userDto.setUsername(log.getUser().getUsername());
+            userDto.setEmail(log.getUser().getEmail());
+            dto.setUser(userDto);
+        } else {
+            dto.setUser(null);
+        }
+
         return dto;
     }
 }

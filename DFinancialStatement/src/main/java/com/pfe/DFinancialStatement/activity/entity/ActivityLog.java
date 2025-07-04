@@ -2,11 +2,13 @@ package com.pfe.DFinancialStatement.activity.entity;
 
 import com.pfe.DFinancialStatement.activity.enums.ActionType;
 import com.pfe.DFinancialStatement.auth.entity.User;
+import com.pfe.DFinancialStatement.common.MapToJsonConverter; // You will create this
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
 @Table(name = "activity_logs")
@@ -24,7 +26,11 @@ public class ActivityLog {
     @Enumerated(EnumType.STRING)
     private ActionType actionType;
 
-    private String description;
+    private String messageKey;
+
+    @Convert(converter = MapToJsonConverter.class)
+    @Column(columnDefinition = "TEXT")
+    private Map<String, String> params;
 
     private LocalDateTime timestamp = LocalDateTime.now();
 }
