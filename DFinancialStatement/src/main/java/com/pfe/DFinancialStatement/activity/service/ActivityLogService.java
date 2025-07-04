@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,12 +28,14 @@ public class ActivityLogService {
         this.mapper = mapper;
     }
 
-    public void log(ActionType actionType, String description) {
+    // ✅ Updated to support messageKey and params
+    public void log(ActionType actionType, String messageKey, Map<String, String> params) {
         User user = authService.getCurrentUser();
         ActivityLog log = new ActivityLog();
         log.setUser(user);
         log.setActionType(actionType);
-        log.setDescription(description);
+        log.setMessageKey(messageKey);
+        log.setParams(params);
         repository.save(log);
     }
 

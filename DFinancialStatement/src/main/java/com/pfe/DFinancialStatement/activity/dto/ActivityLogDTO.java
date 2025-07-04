@@ -1,14 +1,22 @@
 package com.pfe.DFinancialStatement.activity.dto;
 
-import com.pfe.DFinancialStatement.activity.enums.ActionType;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data
 public class ActivityLogDTO {
-    private String username;
-    private ActionType actionType;
-    private String description;
-    private LocalDateTime timestamp;
+    private Long id;
+    private String actionType;
+    private String messageKey;
+    private Map<String, String> params;
+    private String timestamp;
+    private UserDTO user;
+
+    @Data
+    public static class UserDTO {
+        private Long id;
+        private String username;
+        private String email;
+    }
 }

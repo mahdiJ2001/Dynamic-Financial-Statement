@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class DmnRuleImportService {
@@ -90,7 +91,11 @@ public class DmnRuleImportService {
             User currentUser = authService.getCurrentUser();
             activityLogService.log(
                     ActionType.CREATE_VALIDATION_MODEL,
-                    "User " + currentUser.getUsername() + " created validation model with ruleKey: " + ruleKey
+                    "VALIDATION_MODEL_CREATED",
+                    Map.of(
+                            "username", currentUser.getUsername(),
+                            "ruleKey", ruleKey
+                    )
             );
 
             return savedRule;

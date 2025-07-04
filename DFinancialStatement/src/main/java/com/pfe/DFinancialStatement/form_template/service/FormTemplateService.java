@@ -10,6 +10,7 @@ import com.pfe.DFinancialStatement.form_template.repository.FormTemplateReposito
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -38,7 +39,11 @@ public class FormTemplateService {
         // Log activity
         activityLogService.log(
                 ActionType.CREATE_TEMPLATE,
-                "User " + currentUser.getUsername() + " created template: " + saved.getName()
+                "TEMPLATE_CREATED", // 🔑 Translation key
+                Map.of(
+                        "username", currentUser.getUsername(),
+                        "templateName", saved.getName()
+                )
         );
 
         return saved;
@@ -61,7 +66,11 @@ public class FormTemplateService {
             User currentUser = authService.getCurrentUser();
             activityLogService.log(
                     ActionType.DELETE_TEMPLATE,
-                    "User " + currentUser.getUsername() + " deleted template: " + templateOpt.get().getName()
+                    "TEMPLATE_DELETED",
+                    Map.of(
+                            "username", currentUser.getUsername(),
+                            "templateName", templateOpt.get().getName()
+                    )
             );
 
             return true;
