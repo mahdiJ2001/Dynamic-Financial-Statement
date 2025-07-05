@@ -50,31 +50,6 @@ public class DmnExecutionController {
         return ResponseEntity.ok(rules);
     }
 
-
-
-    /*
-    @PostMapping("/dmn/import")
-    public ResponseEntity<?> importDmn(
-            @RequestParam("ruleKey") String ruleKey,
-            @RequestParam("file") MultipartFile file) {
-        try {
-            DmnRule rule = dmnRuleImportService.importDmn(ruleKey, file);
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "DMN importé avec succès");
-            response.put("ruleKey", rule.getRuleKey());
-            return ResponseEntity.ok(response);
-        } catch (CustomException e) {
-            String errorMessage = errorMessageService.getErrorMessage(e.getErrorCode());
-
-            Map<String, String> response = new HashMap<>();
-            response.put("error", errorMessage);
-            return ResponseEntity.badRequest().body(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "Erreur interne : " + e.getMessage()));
-        }
-    }*/
-
     @GetMapping("/dmn/compatible/ai")
     public ResponseEntity<List<DmnRule>> getCompatibleDmnsAI(@RequestParam("fields") String fields) {
         Set<String> formFields = new HashSet<>(Arrays.asList(fields.split(",")));
@@ -102,6 +77,13 @@ public class DmnExecutionController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(Collections.singletonMap("message", "Règle DMN créée et sauvegardée avec succès."));
     }
+
+    @DeleteMapping("/dmn/{id}")
+    public ResponseEntity<?> deleteDmnRule(@PathVariable Long id) {
+        dmnRuleImportService.deleteDmnRule(id);
+        return ResponseEntity.ok(Collections.singletonMap("message", "Règle DMN supprimée avec succès."));
+    }
+
 
 
 }

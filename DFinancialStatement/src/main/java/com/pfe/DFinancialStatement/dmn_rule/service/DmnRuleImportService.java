@@ -105,6 +105,22 @@ public class DmnRuleImportService {
         }
     }
 
+    public void deleteDmnRule(Long id) {
+        DmnRule dmnRule = dmnRuleRepository.findById(id)
+                .orElseThrow(() -> new CustomException("DMN_RULE_NOT_FOUND"));
+
+        dmnRuleRepository.delete(dmnRule);
+
+        User currentUser = authService.getCurrentUser();
+        activityLogService.log(
+                ActionType.DELETE_VALIDATION_MODEL,
+                "VALIDATION_MODEL_DELETED",
+                Map.of(
+                        "username", currentUser.getUsername(),
+                        "ruleKey", dmnRule.getRuleKey()
+                )
+        );
+    }
 
 
 }
