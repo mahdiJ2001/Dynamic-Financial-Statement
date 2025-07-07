@@ -1,0 +1,169 @@
+<div class="header pb-8 pt-3 pt-lg-4 d-flex align-items-center" style="min-height: 300px; background-size: cover; background-position: center top;">
+  <span class="mask bg-gradient-danger opacity-8"></span>
+  <div class="container-fluid d-flex align-items-center">
+    <div class="row">
+      <div class="col-lg-7 col-md-10">
+        <h1 class="display-2 text-white">{{ 'templateBuilder.header.title' | translate }}</h1>
+        <p class="text-white mt-0 mb-5">{{ 'templateBuilder.header.description' | translate }}</p>
+        <!-- Button to go to templates with icon -->
+        <a (click)="goToTemplates()" class="btn btn-secondary">
+          <i class="fas fa-file-alt" style="margin-right: 8px;"></i> {{ 'templateBuilder.header.goToTemplates' | translate }}
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container-fluid mt--7">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      <div class="card bg-secondary shadow">
+        <div class="card-header bg-white border-0">
+          <div class="row align-items-center">
+            <div class="col-8">
+              <h3 class="mb-0">{{ 'templateBuilder.form.title' | translate }}</h3>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <form>
+            <!-- JSON Import Section -->
+            <h6 class="heading-small text-muted mb-5" style="color: grey;">{{ 'templateBuilder.form.jsonImport.title' | translate }}</h6>
+
+            <div class="pl-lg-4">
+              <div class="form-group">
+                <label for="jsonText">{{ 'templateBuilder.form.jsonImport.label' | translate }}</label>
+                <textarea
+                  id="jsonText"
+                  class="form-control form-control-alternative"
+                  rows="6"
+                  [placeholder]="'templateBuilder.form.jsonImport.placeholder' | translate"
+                  [(ngModel)]="jsonText"
+                  [ngModelOptions]="{ standalone: true }"
+                  (change)="handleJsonImportFromText(jsonText)"
+                ></textarea>
+                <small class="form-text text-muted">{{ 'templateBuilder.form.jsonImport.placeholder' | translate }}</small>
+              </div>
+            
+              <!-- Button to import the JSON -->
+              <button class="btn btn-danger btn-lg" (click)="handleJsonImportFromText(jsonText)">
+                <i class="fas fa-file-code me-2"></i> {{ 'templateBuilder.form.jsonImport.button' | translate }}
+              </button>
+            </div>            
+            
+            <hr style="border-top: 1px solid #dcdcdc; margin: 30px 0;">
+
+            <!-- Actif Sections -->
+            <h6 class="heading-small text-muted mb-5" style="color: grey;">{{ 'templateBuilder.form.sections.active' | translate }}</h6>
+            <div class="pl-lg-4">
+              <div *ngFor="let section of actifSections; let i = index" class="form-section">
+                <div class="section-header d-flex justify-content-between">
+                  <h5 style="font-size: 0.9rem; color: #3b3e50;">{{ section.name }}</h5>
+                  <div class="section-actions">
+                    <button class="btn btn-secondary btn-sm" (click)="editSectionName(section)" [title]="'templateBuilder.form.sections.actions.edit' | translate">
+                      <i class="fas fa-pencil-alt"></i> {{ 'templateBuilder.form.sections.actions.edit' | translate }}
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="removeSection('actif', i)" [title]="'templateBuilder.form.sections.actions.delete' | translate">
+                      <i class="fas fa-trash-alt"></i> {{ 'templateBuilder.form.sections.actions.delete' | translate }}
+                    </button>
+                  </div>
+                </div>
+                <div class="field-list">
+                  <div *ngFor="let field of section.fields" class="field-item d-flex justify-content-between">
+                    <span>{{ field.label }}</span>
+                    <div class="field-actions">
+                      <button class="btn btn-icon" (click)="editFieldLabel(field)" [title]="'templateBuilder.form.sections.actions.edit' | translate">
+                        <i class="fas fa-pencil-alt"></i>
+                      </button>
+                      <button class="btn btn-icon btn-danger" (click)="removeField(section, field)" [title]="'templateBuilder.form.sections.actions.delete' | translate">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="add-field-container mt-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <input class="form-control form-control-alternative" type="text" [placeholder]="'templateBuilder.form.sections.field.placeholder' | translate" #newFieldInputActif name="newFieldInputActif">
+                    <button class="btn btn-link btn-sm ml-2" (click)="addFieldFromInput(section, newFieldInputActif.value); newFieldInputActif.value = ''" [title]="'templateBuilder.form.sections.actions.addField' | translate">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="drag-drop-zone" (click)="addNewSection('actif')">
+              <div class="drag-drop-frame">
+                <span class="drag-drop-text">{{ 'templateBuilder.form.sections.addActive' | translate }}</span>
+              </div>
+            </div>
+
+            <hr style="border-top: 1px solid #dcdcdc; margin: 30px 0;">
+
+            <!-- Passif Sections -->
+            <h6 class="heading-small text-muted mb-5 mt-5" style="color: grey;">{{ 'templateBuilder.form.sections.passive' | translate }}</h6>
+            <div class="pl-lg-4">
+              <div *ngFor="let section of passifSections; let i = index" class="form-section">
+                <div class="section-header d-flex justify-content-between">
+                  <h5 class="text-dark" style="font-size: 0.9rem; color: #3a3a3a;">{{ section.name }}</h5>
+                  <div class="section-actions">
+                    <button class="btn btn-secondary btn-sm" (click)="editSectionName(section)" [title]="'templateBuilder.form.sections.actions.edit' | translate">
+                      <i class="fas fa-pencil-alt"></i> {{ 'templateBuilder.form.sections.actions.edit' | translate }}
+                    </button>
+                    <button class="btn btn-danger btn-sm" (click)="removeSection('passif', i)" [title]="'templateBuilder.form.sections.actions.delete' | translate">
+                      <i class="fas fa-trash-alt"></i> {{ 'templateBuilder.form.sections.actions.delete' | translate }}
+                    </button>
+                  </div>
+                </div>
+                <div class="field-list">
+                  <div *ngFor="let field of section.fields" class="field-item d-flex justify-content-between">
+                    <span>{{ field.label }}</span>
+                    <div class="field-actions">
+                      <button class="btn btn-icon" (click)="editFieldLabel(field)" [title]="'templateBuilder.form.sections.actions.edit' | translate">
+                        <i class="fas fa-pencil-alt"></i>
+                      </button>
+                      <button class="btn btn-icon btn-danger" (click)="removeField(section, field)" [title]="'templateBuilder.form.sections.actions.delete' | translate">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </div>                    
+                  </div>
+                </div>
+                <div class="add-field-container mt-3">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <input class="form-control form-control-alternative" type="text" [placeholder]="'templateBuilder.form.sections.field.placeholder' | translate" #newFieldInputPassif name="newFieldInputPassif">
+                    <button class="btn btn-link btn-sm ml-2" (click)="addFieldFromInput(section, newFieldInputPassif.value); newFieldInputPassif.value = ''" [title]="'templateBuilder.form.sections.actions.addField' | translate">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="drag-drop-zone" (click)="addNewSection('passif')">
+              <div class="drag-drop-frame">
+                <span class="drag-drop-text">{{ 'templateBuilder.form.sections.addPassive' | translate }}</span>
+              </div>
+            </div>
+
+
+            <hr style="border-top: 1px solid #dcdcdc; margin: 30px 0;">
+
+            <!-- Template Name Field and Save Button -->
+            <div class="form-group mt-5">
+              <label for="templateName">{{ 'templateBuilder.form.template.name.label' | translate }}</label>
+              <input type="text" class="form-control form-control-alternative" id="templateName" [placeholder]="'templateBuilder.form.template.name.placeholder' | translate" [(ngModel)]="templateName" name="templateName">
+            </div>
+            
+            <div class="text-center mt-4">
+              <button type="button" class="btn btn-danger" (click)="saveTemplate()">
+                <i class="fas fa-save me-2"></i> {{ 'templateBuilder.form.template.save' | translate }}
+              </button>              
+            </div>                        
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

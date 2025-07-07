@@ -1,0 +1,127 @@
+<div class="container-fluid py-4">
+  <div class="card shadow border-0 rounded-lg overflow-hidden">
+    <!-- Header -->
+    <div class="card-header bg-gradient-primary border-0 py-3">
+      <div class="row align-items-center">
+        <!-- Icon + Title -->
+        <div class="col-6">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-bell text-white me-3 fs-6" style="font-size: 1.5rem;margin-right: 0.8rem;"></i>
+            <h3 class="mb-0 text-white fw-bold">
+              {{ 'notifications.title' | translate }}
+              <small class="text-white-50 ms-2 fs-6">
+                ({{ filteredNotifications.length }} {{ 'notifications.count' | translate }})
+              </small>
+            </h3>
+          </div>
+        </div>
+
+        <div class="col-2"></div>
+
+        <!-- Buttons -->
+        <div class="col-4 d-flex justify-content-end align-items-center gap-2">
+          <button class="btn btn-sm btn-primary rounded-pill px-3 py-2 d-flex align-items-center"
+            (click)="loadNotifications()" [disabled]="loading">
+            <i class="fas fa-sync-alt me-2" [class.fa-spin]="loading"></i>
+            <span class="d-none d-md-inline">{{ 'notifications.refresh' | translate }}</span>
+          </button>
+
+          <button *ngIf="notifications.length > 0"
+            class="btn btn-sm btn-primary rounded-pill px-3 py-2 d-flex align-items-center" (click)="markAllRead()"
+            [disabled]="notifications.length === 0">
+            <i class="fas fa-check-double me-2"></i>
+            <span class="d-none d-md-inline">{{ 'notifications.markAllRead' | translate }}</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Dropdown -->
+    <div class="bg-white px-4 pt-3 pb-2">
+      <div class="d-flex justify-content-start">
+        <div class="form-group mb-0" style="min-width: 200px;">
+          <label class="form-control-label text-muted small mb-2">
+            {{ 'notifications.filters.label' | translate }}
+          </label>
+          <select class="form-control form-control-sm"
+                  [(ngModel)]="selectedFilter"
+                  (change)="applyFilter()"
+                  style="max-height: 150px; overflow-y: auto;">
+            <option value="ALL">{{ 'notifications.filters.all' | translate }}</option>
+            <option value="VALIDATED">{{ 'notifications.filters.validated' | translate }}</option>
+            <option value="REJECTED">{{ 'notifications.filters.rejected' | translate }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="card-body p-5 text-center" *ngIf="loading">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">{{ 'notifications.loading' | translate }}</span>
+      </div>
+      <p class="text-muted mb-0">{{ 'notifications.loading' | translate }}</p>
+    </div>
+
+    <!-- Error -->
+    <div class="card-body p-5" *ngIf="error">
+      <div class="alert alert-danger border-0 rounded-lg d-flex align-items-center mb-0">
+        <i class="fas fa-exclamation-triangle me-3 fa-lg"></i>
+        <div>
+          <strong>{{ 'notifications.error' | translate }}</strong><br>
+          <small>{{ 'notifications.errorDetail' | translate }}</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty -->
+    <div class="card-body p-5 text-center" *ngIf="!loading && filteredNotifications.length === 0 && !error">
+      <i class="fas fa-bell-slash fa-3x text-muted opacity-50 mb-3"></i>
+      <h6 class="text-muted mb-2">{{ 'notifications.noNew' | translate }}</h6>
+      <small class="text-muted">{{ 'notifications.emptyDetail' | translate }}</small>
+    </div>
+
+    <!-- List -->
+    <div *ngIf="!loading && filteredNotifications.length > 0">
+      <div *ngFor="let notif of filteredNotifications" class="d-flex align-items-center px-4 py-3 border-bottom">
+        <!-- Indicator -->
+        <div class="flex-shrink-0 me-3">
+          <div class="rounded-circle d-flex align-items-center justify-content-center" [ngClass]="{
+                 'bg-success-light text-success': isValidated(notif.messageKey),
+                 'bg-danger-light text-danger': isRejected(notif.messageKey),
+                 'bg-primary-light text-primary': !isValidated(notif.messageKey) && !isRejected(notif.messageKey)
+               }" style="width: 2rem; height: 2rem;">
+            <i class="fas fa-lg" [ngClass]="{
+                 'fa-check-circle': isValidated(notif.messageKey),
+                 'fa-times-circle': isRejected(notif.messageKey),
+                 'fa-info-circle': !isValidated(notif.messageKey) && !isRejected(notif.messageKey)
+               }"></i>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-grow-1">
+          <div class="d-flex justify-content-between align-items-start">
+            <!-- Bold translated message -->
+            <p class="mb-1 fw-bold text-dark">
+              {{ ('notifications.' + notif.messageKey) | translate: notif.params }}
+            </p>
+            <span class="badge rounded-pill"
+                  [ngClass]="{
+                    'bg-success': isValidated(notif.messageKey),
+                    'bg-danger': isRejected(notif.messageKey),
+                    'bg-primary': !isValidated(notif.messageKey) && !isRejected(notif.messageKey)
+                  }">
+              <i class="fas fa-circle fa-xs me-1"></i>{{ 'notifications.new' | translate }}
+            </span>
+          </div>
+
+          <!-- Date -->
+          <div class="d-flex align-items-center text-muted small fst-italic">
+            {{ notif.createdAt | date:'short' }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
