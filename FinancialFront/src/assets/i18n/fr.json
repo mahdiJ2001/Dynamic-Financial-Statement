@@ -1,0 +1,558 @@
+{
+    "templateBuilder": {
+        "header": {
+            "title": "Création du Template",
+            "description": "Créez vos modèles de formulaire financier en ajoutant dynamiquement des sections et des champs ci-dessous ou en important un JSON.",
+            "goToTemplates": "Aller aux Templates"
+        },
+        "form": {
+            "title": "Formulaire Template Builder",
+            "jsonImport": {
+                "title": "Import Template JSON",
+                "label": "Importer votre Template depuis un JSON",
+                "placeholder": "Collez votre contenu JSON ici",
+                "button": "Importer le template depuis le JSON",
+                "exampleJson": "Exemple du format JSON attendu :\n{\n  \"name\": \"Template de bilan\",\n  \"actif\": [\n    {\n      \"name\": \"Immobilisations corporelles\",\n      \"fields\": [\n        { \"label\": \"Terrains et constructions\" },\n        { \"label\": \"Machines et équipements\" }\n      ]\n    },\n    {\n      \"name\": \"Immobilisations incorporelles\",\n      \"fields\": [\n        { \"label\": \"Fonds de commerce\" },\n        { \"label\": \"Logiciels\" }\n      ]\n    }\n  ],\n  \"passif\": [\n    {\n      \"name\": \"Capitaux propres\",\n      \"fields\": [\n        { \"label\": \"Capital social\" },\n        { \"label\": \"Réserves\" }\n      ]\n    }\n  ]\n}"
+            },
+            "sections": {
+                "active": "Sections Actives",
+                "passive": "Sections Passives",
+                "addActive": "Cliquez pour ajouter une section Actif",
+                "addPassive": "Cliquez pour ajouter une section Passif",
+                "actions": {
+                    "edit": "Modifier",
+                    "delete": "Supprimer",
+                    "addField": "Ajouter un champ"
+                },
+                "field": {
+                    "placeholder": "Libellé du champ"
+                }
+            },
+            "template": {
+                "name": {
+                    "label": "Nom du Template",
+                    "placeholder": "Nom du Template"
+                },
+                "save": "Enregistrer"
+            }
+        },
+        "alerts": {
+            "section": {
+                "nameRequired": "Le nom de la section est requis",
+                "nameLengthError": "Le nom doit contenir entre {min} et {max} caractères",
+                "nameInvalidChars": "Le nom contient des caractères non autorisés",
+                "nameExists": "Une section avec ce nom existe déjà",
+                "addSuccess": "La section a été ajoutée avec succès",
+                "editTitle": "Modifier le nom de la section :",
+                "editPlaceholder": "Nouveau nom de section",
+                "editExistingName": "Une autre section avec ce nom existe déjà",
+                "editSuccess": "Le nom de la section a été mis à jour avec succès",
+                "newTitle": "Nom de la nouvelle section  :",
+                "inputPlaceholder": "Entrez le nom de la section"
+            },
+            "field": {
+                "invalidLength": "Le libellé du champ doit contenir entre {min} et {max} caractères",
+                "invalidChars": "Le libellé du champ contient des caractères non autorisés",
+                "editTitle": "Modifier le libellé du champ :",
+                "editPlaceholder": "Nouveau libellé",
+                "labelRequired": "Le libellé est requis",
+                "editSuccess": "Le libellé du champ a été mis à jour avec succès"
+            },
+            "template": {
+                "missingFields": "Veuillez saisir un nom de template et ajouter au moins un champ dans une section",
+                "saveSuccess": "Le template a été enregistré avec succès !",
+                "saveError": "Une erreur est survenue lors de l'enregistrement du template"
+            },
+            "json": {
+                "invalidFile": "Le fichier JSON est invalide",
+                "importSuccess": "Le template a été importé avec succès !",
+                "importError": "Erreur lors de l'importation du fichier JSON"
+            },
+            "buttons": {
+                "add": "Ajouter",
+                "cancel": "Annuler",
+                "edit": "Modifier"
+            }
+        }
+    },
+    "dashboard": {
+        "welcome": {
+            "title": "Tableau de bord",
+            "subtitle": "Accédez à vos modèles, visualisez les indicateurs financiers et suivez l'activité récente",
+            "welcomeUser": "Bienvenue, {{username}}"
+        },
+        "stats": {
+            "templates": "Modèles",
+            "reports": "Rapports",
+            "dmn": "DMN",
+            "users": "Utilisateurs",
+            "since": "Depuis le mois dernier"
+        },
+        "charts": {
+            "reportsGenerated": {
+                "title": "Rapports générés",
+                "overview": "Aperçu",
+                "timeRange": {
+                    "week": "Semaine",
+                    "month": "Mois"
+                }
+            },
+            "templatesCreated": {
+                "title": "Modèles créés",
+                "performance": "Performance"
+            }
+        },
+        "quickAccess": {
+            "templateBuilder": {
+                "title": "Créateur de modèle",
+                "description": "Créez un nouveau modèle personnalisé pour générer votre bilan financier",
+                "action": "Accéder"
+            },
+            "templateList": {
+                "title": "Liste des modèles",
+                "description": "Consultez et sélectionnez un modèle existant pour générer votre bilan financier",
+                "action": "Accéder"
+            },
+            "reportList": {
+                "title": "Liste des bilans",
+                "description": "Consultez et gérez les bilans financiers générés précédemment",
+                "action": "Accéder"
+            }
+        },
+        "timeline": {
+            "step1": {
+                "title": "Créer un modèle",
+                "description": "Commencez par créer votre modèle de bilan"
+            },
+            "step2": {
+                "title": "Remplir les données",
+                "description": "Saisissez vos données financières"
+            },
+            "step3": {
+                "title": "Générer le rapport",
+                "description": "Obtenez votre bilan financier"
+            }
+        },
+        "actions": {
+            "startNow": "Commencer maintenant"
+        },
+        "activityLogs": {
+            "title": "Journaux d'activité",
+            "headers": {
+                "user": "Utilisateur",
+                "actionType": "Type d'action",
+                "description": "Description",
+                "timestamp": "Horodatage"
+            },
+            "noLogsFound": "Aucun journal d'activité trouvé.",
+            "filters": {
+                "actionType": "Filtrer par type d'action",
+                "all": "Toutes les actions"
+            },
+            "actionTypes": {
+                "CREATE_TEMPLATE": "Création de modèle",
+                "SUBMIT_REPORT": "Soumission de rapport",
+                "DELETE_TEMPLATE": "Suppression de modèle",
+                "VALIDATE_REPORT": "Validation de rapport",
+                "CREATE_VALIDATION_MODEL": "Création de modèle de validation",
+                "REJECT_REPORT": "Rejet de rapport",
+                "DELETE_VALIDATION_MODEL": "Suppression de Régle"
+            }
+        },
+        "pagination": {
+            "previous": "Précédent",
+            "next": "Suivant"
+        }
+    },
+    "login": {
+        "navigation": {
+            "login": "Connexion",
+            "register": "S'inscrire"
+        },
+        "header": {
+            "welcome": "Bienvenue !",
+            "description": "Créez un compte et commencez à construire vos états financiers."
+        },
+        "form": {
+            "socialLogin": {
+                "title": "Se connecter avec",
+                "google": "Google"
+            },
+            "credentials": {
+                "title": "Ou connectez-vous avec vos identifiants",
+                "email": {
+                    "placeholder": "Email"
+                },
+                "password": {
+                    "placeholder": "Mot de passe"
+                },
+                "rememberMe": "Se souvenir de moi",
+                "submit": "Se connecter"
+            }
+        },
+        "links": {
+            "forgotPassword": "Mot de passe oublié ?",
+            "createAccount": "Créer un nouveau compte"
+        },
+        "errors": {
+            "loginFailed": "La connexion a échoué. Veuillez réessayer."
+        }
+    },
+    "register": {
+        "navigation": {
+            "login": "Connexion",
+            "register": "S'inscrire"
+        },
+        "header": {
+            "welcome": "Bienvenue !",
+            "description": "Créez un compte et commencez à construire vos états financiers."
+        },
+        "form": {
+            "socialSignup": {
+                "title": "S'inscrire avec",
+                "google": "Google"
+            },
+            "credentials": {
+                "title": "Ou inscrivez-vous avec vos identifiants",
+                "name": {
+                    "placeholder": "Nom"
+                },
+                "email": {
+                    "placeholder": "Email"
+                },
+                "password": {
+                    "placeholder": "Mot de passe"
+                },
+                "submit": "S'inscrire"
+            }
+        },
+        "errors": {
+            "allFieldsRequired": "Tous les champs sont requis.",
+            "registrationFailed": "Une erreur est survenue. Veuillez réessayer."
+        }
+    },
+    "languages": {
+        "en": "English",
+        "fr": "Français"
+    },
+    "reportList": {
+        "header": {
+            "title": "Rapports Financiers",
+            "searchPlaceholder": "Rechercher par nom d'entreprise..."
+        },
+        "filters": {
+            "status": {
+                "label": "Statut",
+                "all": "Tous les statuts",
+                "validated": "Validé",
+                "pending": "En attente",
+                "rejected": "Rejeté"
+            },
+            "contributor": {
+                "label": "Contributeur",
+                "placeholder": "Filtrer par contributeur..."
+            },
+            "date": {
+                "label": "Date"
+            },
+            "reset": "Réinitialiser les filtres"
+        },
+        "table": {
+            "headers": {
+                "id": "ID",
+                "contributor": "CONTRIBUTEUR",
+                "companyName": "NOM DE L'ENTREPRISE",
+                "creationDate": "DATE DE CRÉATION",
+                "status": "STATUT",
+                "actions": "ACTIONS"
+            },
+            "status": {
+                "validated": "Validé",
+                "pending": "En attente",
+                "rejected": "Rejeté"
+            },
+            "actions": {
+                "preview": "Prévisualiser",
+                "seeReason": "Voir raison",
+                "validate": "Valider",
+                "reject": "Rejeter",
+                "submit": "Soumettre",
+                "sendMessage": "Envoyer le message",
+                "viewDiscussion": "Chat"
+            },
+            "noContributor": "Aucun contributeur",
+            "invalidJson": "Données invalides",
+            "rejectionReason": "Raison du rejet...",
+            "messagePlaceholder": "Écrivez un message pour l'administrateur...",
+            "messages": {
+                "messageSent": "Message envoyé avec succès.",
+                "messageError": "Erreur lors de l'envoi du message."
+            }
+        },
+        "emptyState": {
+            "title": "Aucun rapport disponible",
+            "searchMessage": "Aucun résultat pour \"{{searchTerm}}\"",
+            "defaultMessage": "Les rapports financiers s'afficheront ici une fois créés"
+        },
+        "pagination": {
+            "previous": "Précédent",
+            "next": "Suivant",
+            "page": "Page {{current}} sur {{total}}"
+        },
+        "modal": {
+            "preview": {
+                "title": "Prévisualisation du PDF",
+                "close": "Fermer",
+                "loading": "Chargement du document..."
+            },
+            "reject": {
+                "title": "Rejeter le rapport",
+                "placeholder": "Saisissez la raison du rejet...",
+                "confirm": "Rejeter",
+                "cancel": "Annuler",
+                "noReason": "Aucune raison fournie"
+            },
+            "chat": {
+                "title": "Discussion",
+                "statementId": "ID de l'état",
+                "close": "Fermer",
+                "noMessages": "Aucun message pour le moment",
+                "messagePlaceholder": "Tapez votre message ici...",
+                "sendHint": "Appuyez sur Entrée pour envoyer ou Maj+Entrée pour une nouvelle ligne",
+                "rejectionWarning": "Cette action rejettera l'état financier. Veuillez vous assurer d'avoir fourni des commentaires via la discussion.",
+                "cancel": "Annuler",
+                "confirmReject": "Confirmer le rejet"
+            }
+        },
+        "messages": {
+            "rejectionSuccess": "Bilan rejeté avec succès",
+            "validationSuccess": "Bilan validé avec succès"
+        }
+    },
+    "ruleBuilder": {
+        "header": {
+            "title": "Éditeur de Règles",
+            "subtitle": "Créez et gérez les règles de validation pour vos états financiers"
+        },
+        "templateSelector": {
+            "label": "Sélectionner un Template",
+            "placeholder": "Choisissez un template..."
+        },
+        "variables": {
+            "title": "Variables Disponibles",
+            "searchPlaceholder": "Rechercher des variables...",
+            "noVariables": "Aucune variable disponible. Veuillez sélectionner un template."
+        },
+        "operators": {
+            "title": "Opérateurs",
+            "arithmetic": "Arithmétique",
+            "logical": "Logique",
+            "comparison": "Comparaison",
+            "lessThan": "Inférieur à",
+            "lessThanEqual": "Inférieur ou égal à",
+            "greaterThan": "Supérieur à",
+            "greaterThanEqual": "Supérieur ou égal à",
+            "equal": "Égal à",
+            "notEqual": "Différent de"
+        },
+        "expressionBuilder": {
+            "title": "Constructeur d'Expression",
+            "dropZone": "Déposez les variables et opérateurs ici",
+            "noExpression": "Votre expression apparaîtra ici",
+            "clear": "Effacer",
+            "clearAll": "Effacer Tout",
+            "undo": "Annuler",
+            "preview": "prévisualiser",
+            "redo": "Rétablir",
+            "validate": "Valider l'Expression",
+            "copy": "Copier l'expression",
+            "empty": "Aucune expression créée. Faites glisser des éléments pour commencer.",
+            "length": "Longueur : {{count}} élément(s)"
+        },
+        "ruleForm": {
+            "operator": "Opérateur",
+            "value": "Valeur",
+            "severity": {
+                "label": "Sévérité",
+                "Warning": "Avertissement",
+                "Blocking": "Bloquant"
+            },
+            "message": "Message",
+            "addRule": "Ajouter une Règle",
+            "updateRule": "Mettre à jour la Règle",
+            "cancel": "Annuler",
+            "expression": "Expression"
+        },
+        "rulesList": {
+            "title": "Règles Définies",
+            "noRules": "Aucune règle définie",
+            "edit": "Modifier",
+            "delete": "Supprimer"
+        },
+        "messages": {
+            "expressionRequired": "L'expression est requise",
+            "operatorRequired": "L'opérateur est requis",
+            "valueRequired": "La valeur est requise",
+            "severityRequired": "La sévérité est requise",
+            "messageRequired": "Le message est requis",
+            "invalidExpression": "Expression invalide",
+            "ruleAdded": "Règle ajoutée avec succès",
+            "ruleUpdated": "Règle mise à jour avec succès",
+            "ruleDeleted": "Règle supprimée avec succès",
+            "confirmDelete": "Êtes-vous sûr de vouloir supprimer cette règle ?",
+            "checkSyntax": "Veuillez vérifier la syntaxe de votre expression",
+            "saveSuccess": "Règles enregistrées avec succès",
+            "saveError": "Erreur lors de l'enregistrement des règles",
+            "templateRequired": "Veuillez sélectionner un modèle",
+            "noRules": "Veuillez ajouter au moins une règle",
+            "namePrompt": "Nom de l'ensemble de règles",
+            "namePlaceholder": "Entrez un nom pour cet ensemble de règles",
+            "nameRequired": "Le nom est requis",
+            "ruleSaved": "Les règles ont été enregistrées avec succès",
+            "ruleError": "Une erreur s'est produite lors de l'enregistrement des règles",
+            "templateLoadError": "Erreur lors du chargement des modèles",
+            "copySuccess": "Expression copiée",
+            "copyDescription": "L'expression a été copiée dans le presse-papiers",
+            "copyError": "Impossible de copier l'expression",
+            "incompleteRule": "Règle incomplète",
+            "completeLastRule": "Veuillez compléter la dernière règle avant d'en ajouter une nouvelle"
+        },
+        "table": {
+            "actions": "Actions"
+        }
+    },
+    "templateList": {
+        "header": {
+            "title": "Templates de Rapports Financiers",
+            "searchPlaceholder": "Rechercher un template"
+        },
+        "card": {
+            "previewAlt": "Aperçu du template",
+            "defaultName": "Template sans nom",
+            "categoryBadge": "Financier",
+            "updatedOn": "Mis à jour le {{date}}"
+        },
+        "actions": {
+            "select": "Sélectionner",
+            "delete": "Supprimer"
+        },
+        "createNewTemplateCard": {
+            "title": "Créer un Template",
+            "description": "Créez un nouveau template personnalisé pour vos rapports financiers"
+        },
+        "emptyState": {
+            "iconAlt": "Icône dossier ouvert",
+            "noTemplatesTitle": "Aucun template disponible",
+            "noTemplatesDescription": "Commencez par créer votre premier template de rapport financier",
+            "createButton": "Créer un Template"
+        },
+        "modal": {
+            "titlePrefix": "Template sélectionné",
+            "valueEntry": " - Saisie des valeurs",
+            "sections": {
+                "active": "Sections Actives",
+                "passive": "Sections Passives",
+                "attachDmn": "Attachez un DMN"
+            },
+            "validationErrors": {
+                "required": "Ce champ est requis.",
+                "min": "La valeur doit être positive.",
+                "previewError": "Veuillez remplir tous les champs, sélectionner un modèle et un DMN."
+            },
+            "dmnSelection": {
+                "instruction": "Sélectionnez un DMN existant ou importez-en un nouveau.",
+                "validationButton": "Validation",
+                "selectedDmn": "DMN sélectionné ",
+                "ruleName": "Nom de la règle"
+            },
+            "pleaseWait": "Veuillez patienter...",
+            "selectDmn": "Sélectionner un DMN :",
+            "previous": "Précédent",
+            "next": "Suivant",
+            "companyNameLabel": "Nom de l'entreprise",
+            "companyNamePlaceholder": "Ex : Société XYZ",
+            "previewReport": "Prévisualiser le rapport",
+            "reportPreviewTitle": "Prévisualisation du Rapport",
+            "tabs": {
+                "pdfPreview": "Aperçu PDF",
+                "validationReport": "Rapport de Validation"
+            },
+            "validation": {
+                "noResults": "Aucun résultat de validation disponible",
+                "resultsInfo": "Les résultats de validation apparaîtront ici après l'évaluation du document.",
+                "summary": "Résumé de la Validation",
+                "rate": "Taux de validation",
+                "criticalErrors": "Erreurs Bloquantes",
+                "warnings": "Avertissements",
+                "passedValidations": "Validations Réussies",
+                "blockingErrorsCount": "Erreurs Bloquantes ({{count}})",
+                "warningsCount": "Avertissements ({{count}})",
+                "expression": "Expression",
+                "condition": "Condition",
+                "evaluatedValue": "Valeur évaluée",
+                "successfulValidationsCount": "Validations Réussies ({{count}})"
+            },
+            "actions": {
+                "closePreview": "Fermer",
+                "submitReport": "Soumettre le rapport",
+                "exportValidationReportCsv": "Exporter le rapport de validation (CSV)",
+                "submitFinancialStatement": "Soumettre le bilan pour validation"
+            },
+            "deleteDmnTitle": "Supprimer le DMN",
+            "deleteDmnText": "Êtes-vous sûr de vouloir supprimer la règle DMN : '{{ruleKey}}' ? Cette action est irréversible.",
+            "confirmDelete": "Oui, supprimer",
+            "cancelDelete": "Annuler",
+            "deleteDmnSuccess": "DMN supprimé",
+            "deleteDmnSuccessText": "La règle DMN '{{ruleKey}}' a été supprimée avec succès.",
+            "deleteDmnError": "Erreur de suppression",
+            "deleteDmnErrorText": "Une erreur est survenue lors de la suppression du DMN. Veuillez réessayer."
+        }
+    },
+    "sidebar": {
+        "title": "Tableau de bord",
+        "core": "Menu principal",
+        "language": "Langue",
+        "logout": "Déconnexion",
+        "dashboard": "Tableau de bord",
+        "createTemplate": "Créer un template",
+        "createRule": "Créer une règle",
+        "templateList": "Liste des templates",
+        "reportList": "Liste des bilans",
+        "notifications": "Notifications"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "markAllRead": "Marquer tout comme lu",
+        "loading": "Chargement...",
+        "noNew": "Aucune nouvelle notification.",
+        "emptyDetail": "Vous n'avez aucune notification pour le moment.",
+        "new": "Nouveau",
+        "error": "Échec du chargement des notifications.",
+        "errorDetail": "Veuillez actualiser la page ou contacter le support si le problème persiste.",
+        "refresh": "Actualiser",
+        "count": "Notification(s)",
+        "markFailed": "Échec du marquage des notifications comme lues.",
+        "filters": {
+            "label": "Filtrer par statut",
+            "all": "Toutes les notifications",
+            "validated": "Validées",
+            "rejetées": "Rejetées"
+        },
+        "REPORT_REJECTED": "Votre état financier \"{{companyName}}\" a été rejeté.",
+        "REPORT_VALIDATED": "Votre état financier \"{{companyName}}\" a été validé."
+    },
+    "common": {
+        "save": "Enregistrer",
+        "error": "Erreur",
+        "success": "Succès",
+        "warning": "Attention",
+        "cancel": "Annuler"
+    },
+    "VALIDATION_MODEL_CREATED": "L'utilisateur {{username}} a créé un modèle de validation avec la clé : {{ruleKey}}",
+    "VALIDATION_MODEL_DELETED": "L'utilisateur {{username}} a supprimé le modèle de validation avec la clé : {{ruleKey}}",
+    "REPORT_REJECTED_LOG": "L'utilisateur {{username}} a rejeté le rapport pour l'entreprise : {{companyName}}",
+    "REPORT_VALIDATED_LOG": "L'utilisateur {{username}} a validé le rapport pour l'entreprise : {{companyName}}",
+    "TEMPLATE_CREATED": "L'utilisateur {{username}} a créé le modèle : {{templateName}}",
+    "TEMPLATE_DELETED": "L'utilisateur {{username}} a supprimé le modèle : {{templateName}}",
+    "REPORT_SUBMITTED": "L'utilisateur {{username}} a soumis le rapport pour l'entreprise : {{companyName}}"
+}

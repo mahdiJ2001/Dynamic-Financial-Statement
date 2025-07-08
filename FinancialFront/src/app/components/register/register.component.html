@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ 'register.title' | translate }}</title>
+</head>
+
+<body>
+  <div class="main-content">
+    <div class="header bg-gradient-danger py-7">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-transparent">
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto align-items-center">
+              <li class="nav-item">
+              <div class="btn-group btn-group-sm me-3">
+                <button
+                  type="button"
+                  class="btn btn-sm text-white border border-white"
+                  [ngClass]="{ 'fw-bold text-decoration-underline': currentLang === 'fr' }"
+                  (click)="switchLanguage('fr')"
+                >
+                  FR
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm text-white border border-white"
+                  [ngClass]="{ 'fw-bold text-decoration-underline': currentLang === 'en' }"
+                  (click)="switchLanguage('en')"
+                >
+                  EN
+                </button>
+              </div>
+            </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" (click)="goToLogin()">
+                  <i class="ni ni-user-run me-2"></i> {{ 'register.navigation.login' | translate }}
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link text-white" (click)="goToRegister()">
+                  <i class="ni ni-circle-08 me-2"></i> {{ 'register.navigation.register' | translate }}
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+
+        <div class="header-body text-center mb-7">
+          <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-6">
+              <h1 class="text-white">{{ 'register.header.welcome' | translate }}</h1>
+              <p class="text-lead text-light">{{ 'register.header.description' | translate }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="separator separator-bottom separator-skew zindex-100">
+        <svg width="100%" height="100" viewBox="0 0 2560 100">
+          <polygon class="fill-default"></polygon>
+        </svg>
+      </div>
+    </div>
+
+    <div class="page-content">
+      <div class="content-wrapper">
+        <div class="container mt--8 pb-5">
+          <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8">
+              <div class="card bg-secondary shadow border-0">
+                <div class="card-header bg-transparent pb-5">
+                  <div class="text-muted text-center mt-2 mb-4">
+                    <small>{{ 'register.form.socialSignup.title' | translate }}</small>
+                  </div>
+                  <div class="text-center center-btn">
+                    <a href="http://localhost:8081/oauth2/authorization/google" class="btn btn-neutral btn-icon">
+                      <span class="btn-inner--icon"><img src="assets/img/icons/common/google.svg" alt="google"></span>
+                      <span class="btn-inner--text">{{ 'register.form.socialSignup.google' | translate }}</span>
+                    </a>
+                  </div>
+                </div>
+
+                <div class="card-body px-lg-5 py-lg-5">
+                  <div class="text-center text-muted mb-4">
+                    <small>{{ 'register.form.credentials.title' | translate }}</small>
+                  </div>
+
+                  <form role="form" (ngSubmit)="onRegister()">
+                    <div class="form-group">
+                      <div class="input-group input-group-alternative mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
+                        </div>
+                        <input [(ngModel)]="username" name="username" class="form-control"
+                          [placeholder]="'register.form.credentials.name.placeholder' | translate"
+                          type="text">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="input-group input-group-alternative mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                        </div>
+                        <input [(ngModel)]="email" name="email" class="form-control"
+                          [placeholder]="'register.form.credentials.email.placeholder' | translate"
+                          type="email">
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="input-group input-group-alternative">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+                        </div>
+                        <input [(ngModel)]="password" name="password" class="form-control"
+                          [placeholder]="'register.form.credentials.password.placeholder' | translate"
+                          type="password">
+                      </div>
+                    </div>
+
+                    <div *ngIf="errorMessage" class="alert alert-danger">
+                      {{ errorMessage | translate }}
+                    </div>
+
+                    <div class="text-center">
+                      <button type="submit" class="btn btn-primary mt-4" [disabled]="loading">
+                        {{ 'register.form.credentials.submit' | translate }}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

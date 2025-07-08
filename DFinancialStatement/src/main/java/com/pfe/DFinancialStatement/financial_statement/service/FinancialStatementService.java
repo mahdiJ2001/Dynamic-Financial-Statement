@@ -20,6 +20,7 @@ import com.pfe.DFinancialStatement.financial_statement.repository.FinancialState
 import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfe.DFinancialStatement.notification.service.NotificationService;
+import com.pfe.DFinancialStatement.outbox.service.OutboxEventService;
 import com.pfe.DFinancialStatement.report_generation.service.ReportGenerationService;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -63,6 +64,9 @@ public class FinancialStatementService {
 
     @Autowired
     private ActivityLogService activityLogService;
+
+    @Autowired
+    private OutboxEventService outboxEventService;
 
 
 
@@ -203,17 +207,20 @@ public class FinancialStatementService {
                 User user = financialStatement.getCreatedBy();
                 User currentUser = authService.getCurrentUser();
 
-                if (statementStatus == StatementStatus.REJECTED) {
+                // Enregistre d'abord le changement d'état
+                financialStatementRepository.save(financialStatement);
 
-                    notificationService.createNotification(
-                            user,
+                if (statementStatus == StatementStatus.REJECTED) {
+                    // Replace notificationService and activityLogService with Outbox
+                    outboxEventService.saveEvent(
+                            "Notification",
                             "REPORT_REJECTED",
-                            Map.of("companyName", financialStatement.getCompanyName())
+                            Map.of("userId", user.getId().toString(), "companyName", financialStatement.getCompanyName())
                     );
 
-                    activityLogService.log(
-                            ActionType.REJECT_REPORT,
-                            "REPORT_REJECTED_LOG",
+                    outboxEventService.saveEvent(
+                            "ActivityLog",
+                            "REPORT_REJECTED_LOG",   // fixed from REJECT_REPORT_LOG
                             Map.of(
                                     "username", currentUser.getUsername(),
                                     "companyName", financialStatement.getCompanyName()
@@ -221,15 +228,15 @@ public class FinancialStatementService {
                     );
 
                 } else if (statementStatus == StatementStatus.VALIDATED) {
-                    notificationService.createNotification(
-                            user,
+                    outboxEventService.saveEvent(
+                            "Notification",
                             "REPORT_VALIDATED",
-                            Map.of("companyName", financialStatement.getCompanyName())
+                            Map.of("userId", user.getId().toString(), "companyName", financialStatement.getCompanyName())
                     );
 
-                    activityLogService.log(
-                            ActionType.VALIDATE_REPORT,
-                            "REPORT_VALIDATED_LOG",
+                    outboxEventService.saveEvent(
+                            "ActivityLog",
+                            "REPORT_VALIDATED_LOG",  // fixed from VALIDATE_REPORT_LOG
                             Map.of(
                                     "username", currentUser.getUsername(),
                                     "companyName", financialStatement.getCompanyName()
@@ -237,12 +244,11 @@ public class FinancialStatementService {
                     );
                 }
 
-                financialStatementRepository.save(financialStatement);
-
                 Map<String, Object> result = new HashMap<>();
                 result.put("status", "success");
                 result.put("message", "Financial statement status updated successfully.");
                 return result;
+
             } else {
                 throw new CustomException("Financial statement not found.");
             }
@@ -253,7 +259,6 @@ public class FinancialStatementService {
             throw new CustomException("Error updating status: " + e.getMessage());
         }
     }
-
 
 
     private void extractFields(Map<String, Object> rawData, String section, Map<String, Object> inputData) {

@@ -1,0 +1,38 @@
+/* Styles complémentaires pour le composant */
+.icon-shape {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(87deg, #dc3545 0, #f55565 100%) !important;
+}
+
+.bg-light-soft {
+    background-color: #f9fafb !important;
+}
+
+.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+
+.bg-soft-success {
+    background-color: rgba(40, 199, 111, 0.12) !important;
+}
+
+.bg-soft-warning {
+    background-color: rgba(236, 250, 48, 0.12) !important;
+}
+
+.bg-soft-danger {
+    background-color: rgba(234, 84, 85, 0.12) !important;
+}
+
+.cursor-not-allowed {
+    cursor: not-allowed !important;
+    pointer-events: none;
+}

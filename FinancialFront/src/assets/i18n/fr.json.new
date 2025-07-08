@@ -1,0 +1,85 @@
+{
+    "templateBuilder": {
+        // ...existing code...
+    },
+    "dashboard": {
+        // ...existing code...
+    },
+    "login": {
+        "navigation": {
+            "login": "Connexion",
+            "register": "S'inscrire"
+        },
+        "header": {
+            "welcome": "Bienvenue !",
+            "description": "Créez un compte et commencez à construire vos états financiers."
+        },
+        "form": {
+            "socialLogin": {
+                "title": "Se connecter avec",
+                "google": "Google"
+            },
+            "credentials": {
+                "title": "Ou connectez-vous avec vos identifiants",
+                "email": {
+                    "placeholder": "Email"
+                },
+                "password": {
+                    "placeholder": "Mot de passe"
+                },
+                "rememberMe": "Se souvenir de moi",
+                "submit": "Se connecter"
+            }
+        },
+        "links": {
+            "forgotPassword": "Mot de passe oublié ?",
+            "createAccount": "Créer un nouveau compte"
+        },
+        "errors": {
+            "loginFailed": "La connexion a échoué. Veuillez réessayer."
+        }
+    },
+    "register": {
+        "navigation": {
+            "login": "Connexion",
+            "register": "S'inscrire"
+        },
+        "header": {
+            "welcome": "Bienvenue !",
+            "description": "Créez un compte et commencez à construire vos états financiers."
+        },
+        "form": {
+            "socialSignup": {
+                "title": "S'inscrire avec",
+                "google": "Google"
+            },
+            "credentials": {
+                "title": "Ou inscrivez-vous avec vos identifiants",
+                "name": {
+                    "placeholder": "Nom"
+                },
+                "email": {
+                    "placeholder": "Email"
+                },
+                "password": {
+                    "placeholder": "Mot de passe"
+                },
+                "submit": "S'inscrire"
+            }
+        },
+        "errors": {
+            "allFieldsRequired": "Tous les champs sont requis.",
+            "registrationFailed": "Une erreur est survenue. Veuillez réessayer."
+        }
+    },
+    "languages": {
+        "en": "English",
+        "fr": "Français"
+    },
+    "reportList": {
+        // ...existing code...
+    },
+    "ruleBuilder": {
+        // ...existing code...
+    }
+}

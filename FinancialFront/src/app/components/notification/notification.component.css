@@ -1,0 +1,8 @@
+.custom-scroll-left {
+    direction: rtl;
+    /* this puts scrollbar to the left */
+    text-align: left;
+    /* keeps text alignment normal */
+    max-height: 150px;
+    overflow-y: auto;
+}
