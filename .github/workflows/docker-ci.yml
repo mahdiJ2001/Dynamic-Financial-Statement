@@ -1,0 +1,30 @@
+name: Docker CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🧱 Build and run docker-compose
+        run: |
+          docker compose -f docker-compose.yml up --build -d
+          sleep 10  # give containers some time to start
+          docker compose ps
+
+      - name: ✅ Check running containers
+        run: docker ps
+
+      - name: 🧹 Tear down
+        run: docker compose down
