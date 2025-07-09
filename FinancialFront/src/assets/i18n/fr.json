@@ -536,7 +536,7 @@
             "label": "Filtrer par statut",
             "all": "Toutes les notifications",
             "validated": "Validées",
-            "rejetées": "Rejetées"
+            "rejected": "Rejetées"
         },
         "REPORT_REJECTED": "Votre état financier \"{{companyName}}\" a été rejeté.",
         "REPORT_VALIDATED": "Votre état financier \"{{companyName}}\" a été validé."
