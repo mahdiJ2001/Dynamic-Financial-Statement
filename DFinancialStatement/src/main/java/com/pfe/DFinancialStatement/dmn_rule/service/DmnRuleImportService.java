@@ -12,6 +12,7 @@ import com.pfe.DFinancialStatement.dmn_rule.repository.DmnRuleRepository;
 import com.pfe.DFinancialStatement.error_messages.exception.CustomException;
 import com.pfe.DFinancialStatement.form_template.entity.FormTemplate;
 import com.pfe.DFinancialStatement.form_template.repository.FormTemplateRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -68,6 +69,8 @@ public class DmnRuleImportService {
         return dmnRuleRepository.findByRuleKey(ruleKey).isPresent();
     }
 
+
+    @Transactional
     public DmnRule saveNewDmnRule(Long templateId, String ruleKey, String ruleContent, List<RuleDto> ruleDtos) {
         if (dmnRuleRepository.findByRuleKey(ruleKey).isPresent()) {
             throw new CustomException("RULE_KEY_EXISTS");
