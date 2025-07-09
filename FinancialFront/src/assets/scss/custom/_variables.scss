@@ -1035,3 +1035,13 @@ $theme-colors-rgb: (
   $theme-colors-rgb: map-merge($theme-colors-rgb,
       ($color: to-rgb($value)));
 }
+
+// Polyfill for Bootstrap 4.3+ $theme-colors-text support
+$theme-colors-text: (
+  ) !default;
+
+@each $color, $value in $theme-colors {
+  $theme-colors-text: map-merge($theme-colors-text,
+      ($color: color-contrast($value))
+  );
+}
