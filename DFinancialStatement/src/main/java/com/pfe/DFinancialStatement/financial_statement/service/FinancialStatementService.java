@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfe.DFinancialStatement.notification.service.NotificationService;
 import com.pfe.DFinancialStatement.outbox.service.OutboxEventService;
 import com.pfe.DFinancialStatement.report_generation.service.ReportGenerationService;
+import org.springframework.transaction.annotation.Transactional;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class FinancialStatementService {
     private OutboxEventService outboxEventService;
 
 
-
+    @Transactional
     public List<ExpressionEvaluationResult> evaluateAndSaveStatement(FinancialStatementDTO dto, String ruleKey, String designName) {
         List<ExpressionEvaluationResult> evaluationResults = new ArrayList<>();
 

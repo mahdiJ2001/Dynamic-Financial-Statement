@@ -2,6 +2,7 @@ package com.pfe.DFinancialStatement.outbox.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -24,5 +25,6 @@ public class OutboxEvent {
     private String payload;
     private boolean processed = false;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 }
