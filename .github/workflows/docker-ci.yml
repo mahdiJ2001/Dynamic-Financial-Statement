@@ -1,5 +1,4 @@
 name: Docker CI
-
 on:
   push:
     branches: [ master ]
@@ -9,29 +8,29 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: 📥 Checkout code
-        uses: actions/checkout@v3
-
-      - name: 🔎 SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v5
+        uses: actions/checkout@v4
         with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
-
+          fetch-depth: 0
+          
+      - name: 🔎 SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v5.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          
       - name: 🐳 Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
+        
       - name: 🧱 Build and run docker-compose
         run: |
           docker compose -f docker-compose.yml up --build -d
           sleep 10  # give containers some time to start
           docker compose ps
-
+          
       - name: ✅ Check running containers
         run: docker ps
-
+        
       - name: 🧹 Tear down
         run: docker compose down
