@@ -1,0 +1,26 @@
+.language-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.language-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #8898aa;
+    text-decoration: none;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.language-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.language-btn.active {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+}

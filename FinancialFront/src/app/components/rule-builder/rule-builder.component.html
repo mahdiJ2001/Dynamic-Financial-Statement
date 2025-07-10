@@ -1,0 +1,279 @@
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ 'ruleBuilder.header.title' | translate }}</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-12">
+        <div class="card shadow mb-4">
+          <div class="card-header bg-gradient-primary border-0 py-3">
+            <div class="row align-items-center">
+              <div class="col-8">
+                <div class="d-flex align-items-center">
+                  <i class="ni ni-ui-04 text-white me-3" style="margin-right: 8px;"></i>
+                  <div>
+                    <h5 class="mb-0 text-white font-weight-bold">{{ 'ruleBuilder.header.title' | translate }}</h5>
+                  </div>
+                </div>
+              </div>
+              <div class="col-4">
+                <div class="d-flex align-items-center justify-content-end">
+                  <label class="form-label me-2 mb-0 text-white">Template :</label>
+                  <select class="form-select template-select" [(ngModel)]="selectedTemplate" (change)="onTemplateChange()">
+                    <option value="" disabled selected hidden>-- Sélectionner un template --</option>
+                    <option *ngFor="let template of templates" [value]="template.id">{{ template.name }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="card-body">
+            <div class="row mb-4">
+              <!-- Variables du template -->
+              <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-body">
+                    <h6 class="section-header">{{ 'ruleBuilder.variables.title' | translate }}</h6>
+                    <div class="search-container mb-2">
+                      <i class="fas fa-search"></i>
+                      <input class="form-control form-control-sm search-input" 
+                             placeholder="Rechercher une variable..." 
+                             [(ngModel)]="searchVariable">
+                    </div>
+                    <!-- Modifiez la section des variables comme suit -->
+                    <div class="mb-4" style="max-height: 200px; overflow-y: auto;">
+                      <div *ngIf="currentTemplateVariables.length === 0" class="text-muted small">
+                        {{ 'ruleBuilder.variables.noVariables' | translate }}
+                      </div>
+                      <!-- Variables -->
+                      <div *ngFor="let variable of filteredVariables()" 
+                        class="variable-pill" 
+                        draggable="true" 
+                        (dragstart)="onDragStart($event, variable, 'variable')">
+                        <i class="fas fa-cube me-2"></i>{{variable}}
+                      </div>
+                    </div>
+
+                    <h6 class="section-header">{{ 'ruleBuilder.operators.title' | translate }}</h6>
+                    <!-- Opérateurs -->
+                    <div class="d-flex flex-wrap mb-3">
+                      <button class="btn btn-sm btn-outline-secondary operator-btn" 
+                              draggable="true" 
+                              (dragstart)="onDragStart($event, '+', 'operator')">+</button>
+                      <button class="btn btn-sm btn-outline-secondary operator-btn" 
+                              draggable="true" 
+                              (dragstart)="onDragStart($event, '-', 'operator')">-</button>
+                      <button class="btn btn-sm btn-outline-secondary operator-btn" 
+                              draggable="true" 
+                              (dragstart)="onDragStart($event, '*', 'operator')">*</button>
+                      <button class="btn btn-sm btn-outline-secondary operator-btn" 
+                              draggable="true" 
+                              (dragstart)="onDragStart($event, '/', 'operator')">/</button>
+                      <button class="btn btn-sm btn-outline-secondary operator-btn" 
+                              draggable="true" 
+                              (dragstart)="onDragStart($event, '(', 'operator')">(</button>
+                      <button class="btn btn-sm btn-outline-secondary operator-btn" 
+                              draggable="true" 
+                              (dragstart)="onDragStart($event, ')', 'operator')">)</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Expression Builder Modifié -->
+              <div class="col-lg-6">
+                <div class="card border-0 shadow-sm h-100">
+                  <div class="card-body">
+                    <h6 class="section-header d-flex align-items-center gap-2">
+                      <i class="fas fa-cube text-primary"></i>{{ 'ruleBuilder.expressionBuilder.title' | translate }}
+                    </h6>
+
+                    <!-- Zone de dépôt améliorée -->
+                    <div class="dropzone mb-4 position-relative" 
+                        (dragover)="allowDrop($event)" 
+                        (drop)="onDrop($event)"
+                        [class.dropzone-active]="isDraggingOver">
+                      <div class="dropzone-content">
+                        <i class="fas fa-cloud-upload-alt fa-2x text-muted mb-2"></i>
+                        <div class="small fw-500">{{ 'ruleBuilder.expressionBuilder.dropZone' | translate }}</div>
+                        <div class="text-muted x-small">Variables {{ 'ruleBuilder.operators.title' | translate | lowercase }}</div>
+                      </div>
+                    </div>
+
+                    <!-- Aperçu d'expression amélioré -->
+                    <div class="expression-preview-container mb-4">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="small text-muted mb-0">
+                          <i class="fas fa-eye me-1"></i>{{ 'ruleBuilder.expressionBuilder.preview' | translate }}
+                        </h6>
+                        <button class="btn btn-sm btn-outline-secondary" 
+                                (click)="copyExpression()"
+                                [disabled]="!expressionParts.length"
+                                title="Copier l'expression">
+                          <i class="fas fa-copy me-1"></i>{{ 'ruleBuilder.expressionBuilder.copy' | translate }}
+                        </button>
+                      </div>
+                      
+                      <div class="expression-display p-3 rounded-2" 
+                          [class.bg-light]="!expressionParts.length"
+                          [class.expression-active]="expressionParts.length">
+                        @if (expressionParts.length) {
+                          <div class="expression-items">
+                            @for (part of expressionParts; track $index) {
+                              <span class="expression-item" 
+                                    [class.variable]="currentTemplateVariables.includes(part)"
+                                    [class.operator]="operators.includes(part)">
+                                {{ part }}
+                                <button class="btn-remove-item" 
+                                        (click)="removeExpressionPart($index)"
+                                        title="Supprimer cet élément">
+                                  <i class="fas fa-times"></i>
+                                </button>
+                              </span>
+                            }
+                          </div>
+                        } @else {
+                          <div class="text-center text-muted py-2">
+                            <i class="fas fa-info-circle me-2"></i>
+                            {{ 'ruleBuilder.expressionBuilder.empty' | translate }}
+                          </div>
+                        }
+                      </div>
+                      
+                      @if (expressionParts.length) {
+                        <div class="mt-2 text-end">
+                          <small class="text-muted">
+                            Longueur: {{ expressionParts.length }} élément(s) | 
+                            <button class="btn-link-sm" (click)="clearExpression()">{{ 'ruleBuilder.expressionBuilder.clearAll' | translate }}</button>
+                          </small>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Barre d'outils avancée -->
+                    <div class="d-flex flex-wrap gap-2">
+                      <button class="btn btn-danger btn-sm px-3" 
+                              (click)="clearExpression()"
+                              [disabled]="!expressionParts.length">
+                        <i class="fas fa-eraser me-1"></i>{{ 'ruleBuilder.expressionBuilder.clear' | translate }}
+                      </button>
+                      <button class="btn btn-success btn-sm px-3" 
+                              (click)="addExpression()"
+                              [disabled]="!expressionParts.length">
+                        <i class="fas fa-share-square me-1"></i>{{ 'ruleBuilder.expressionBuilder.validate' | translate }}
+                      </button>
+                      <div class="btn-group" role="group">
+                        <button class="btn btn-outline-secondary btn-sm"
+                                (click)="undo()"
+                                [disabled]="!canUndo"
+                                title="Annuler">
+                          <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm"
+                                (click)="redo()"
+                                [disabled]="!canRedo"
+                                title="Rétablir">
+                          <i class="fas fa-redo"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Règles DMN - Tableau full width -->
+            <div class="row">
+              <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                      <h6 class="section-header mb-0">{{ 'ruleBuilder.rulesList.title' | translate }}</h6>
+                      <button class="btn btn-sm btn-primary" (click)="createNewRule()">
+                        <i class="fas fa-plus me-1"></i> {{ 'ruleBuilder.ruleForm.addRule' | translate }}
+                      </button>
+                    </div>
+
+                    <!-- Tableau DMN -->
+                    <div class="table-responsive" style="min-height: 350px;">
+                      <table class="dmn-table">
+                        <thead>
+                          <tr>
+                            <th style="width: 20%;">{{ 'ruleBuilder.ruleForm.expression' | translate }}</th>
+                            <th style="width: 30%;">{{ 'ruleBuilder.ruleForm.message' | translate }}</th>
+                            <th style="width: 12%;">{{ 'ruleBuilder.ruleForm.operator' | translate }}</th>
+                            <th style="width: 12%;">{{ 'ruleBuilder.ruleForm.value' | translate }}</th>
+                            <th style="width: 15%;">{{ 'ruleBuilder.ruleForm.severity.label' | translate }}</th>
+                            <th class="actions-cell" style="width: 11%;">{{ 'ruleBuilder.table.actions' | translate }}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let rule of rules; let i = index">
+                            <td>{{ rule.expression }}</td>
+                            <td>
+                              <input type="text" class="form-control form-control-sm" [(ngModel)]="rule.message">
+                            </td>
+                            <td>
+                              <select class="form-select form-select-sm" [(ngModel)]="rule.operator">
+                                <option>&lt;</option>
+                                <option>&lt;=</option>
+                                <option>&gt;</option>
+                                <option>&gt;=</option>
+                                <option>=</option>
+                                <option>!=</option>
+                              </select>
+                            </td>
+                            <td>
+                              <input type="text" class="form-control form-control-sm" [(ngModel)]="rule.value">
+                            </td>
+                            <td>
+                              <span
+                                role="button"
+                                class="severity-badge mt-1"
+                                style="display: inline-block; padding: 2px 8px; font-size: 0.75rem;"
+                                [ngClass]="{
+                                  'severity-blocking': rule.severity === 'Bloquant',
+                                  'severity-warning': rule.severity === 'Avertissement'
+                                }"
+                                (click)="toggleSeverity(rule)"
+                              >
+                                {{ rule.severity }}
+                              </span>
+                            </td>
+                            <td class="actions-cell">
+                              <button class="btn btn-sm btn-outline-danger" (click)="removeRule(i)">
+                                <i class="fas fa-trash"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <button class="btn btn-success btn-sm" (click)="onSaveRules()">
+                <i class="fas fa-save me-1"></i> {{ 'common.save' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

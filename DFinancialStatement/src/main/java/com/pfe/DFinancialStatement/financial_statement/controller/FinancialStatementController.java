@@ -1,12 +1,17 @@
 package com.pfe.DFinancialStatement.financial_statement.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.pfe.DFinancialStatement.dmn_rule.dto.ExpressionEvaluationResult;
 import com.pfe.DFinancialStatement.financial_statement.dto.FinancialStatementDTO;
+import com.pfe.DFinancialStatement.financial_statement.entity.FinancialStatementMessage;
+import com.pfe.DFinancialStatement.financial_statement.service.FinancialStatementMessageService;
 import com.pfe.DFinancialStatement.financial_statement.service.FinancialStatementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -16,16 +21,8 @@ public class FinancialStatementController {
     @Autowired
     private FinancialStatementService financialStatementService;
 
-
-    @PostMapping
-    public ResponseEntity<String> saveFinancialStatement(@RequestBody String formData) {
-
-        FinancialStatementDTO dto = new FinancialStatementDTO();
-        dto.setFormData(formData);
-
-        String analysisResult = financialStatementService.saveFinancialStatement(dto);
-        return ResponseEntity.ok(analysisResult);
-    }
+    @Autowired
+    private FinancialStatementMessageService messageService;
 
     @GetMapping
     public ResponseEntity<List<FinancialStatementDTO>> getAllFinancialStatements() {
@@ -38,4 +35,58 @@ public class FinancialStatementController {
         Optional<FinancialStatementDTO> statement = financialStatementService.getFinancialStatementById(id);
         return statement.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+    @PostMapping
+    public ResponseEntity<List<ExpressionEvaluationResult>> evaluateAndSaveFinancialStatement(
+            @RequestBody FinancialStatementDTO financialStatementDTO,
+            @RequestParam String ruleKey,
+            @RequestParam String designName) {
+
+        List<ExpressionEvaluationResult> evaluationResults =
+                financialStatementService.evaluateAndSaveStatement(financialStatementDTO, ruleKey, designName);
+
+        System.out.println("Résultats d'évaluation : " + evaluationResults);
+
+
+        return ResponseEntity.ok(evaluationResults);
+    }
+
+    @PostMapping("/preview")
+    public ResponseEntity<List<ExpressionEvaluationResult>> previewFinancialStatement(
+            @RequestBody FinancialStatementDTO financialStatementDTO,
+            @RequestParam String ruleKey,
+            @RequestParam String designName) throws JsonProcessingException {
+
+        List<ExpressionEvaluationResult> evaluationResults =
+                financialStatementService.evaluateWithoutSaving(financialStatementDTO, ruleKey, designName);
+
+        return ResponseEntity.ok(evaluationResults);
+    }
+
+
+    @PutMapping("/status/{id}")
+    public ResponseEntity<Map<String, Object>> updateStatus(
+            @PathVariable Long id,
+            @RequestParam String status,
+            @RequestParam(required = false) String rejectionCause) {
+        Map<String, Object> result = financialStatementService.updateStatus(id, status, rejectionCause);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/{id}/messages")
+    public ResponseEntity<List<FinancialStatementMessage>> getMessages(@PathVariable Long id) {
+        List<FinancialStatementMessage> messages = messageService.getMessagesByFinancialStatementId(id);
+        return ResponseEntity.ok(messages);
+    }
+
+    @PostMapping("/{id}/messages")
+    public ResponseEntity<FinancialStatementMessage> addMessage(
+            @PathVariable Long id,
+            @RequestParam Long senderId,
+            @RequestBody String content) {
+
+        FinancialStatementMessage message = messageService.addMessage(id, senderId, content);
+        return ResponseEntity.ok(message);
+    }
+
 }

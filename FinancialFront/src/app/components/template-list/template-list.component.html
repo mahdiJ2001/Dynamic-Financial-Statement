@@ -1,0 +1,651 @@
+<!-- Page Header -->
+<div class="header pb-8 pt-3 pt-lg-4 d-flex align-items-center"
+  style="min-height: 300px; background-image: url(assets/img/theme/template-list-cover.jpg); background-size: cover; background-position: center top;">
+</div>
+
+<!-- Template List Section - Argon Dashboard Angular Style -->
+<div class="container-fluid mt--7" style="margin-top: -250px !important;">
+  <div class="row">
+    <div class="col-xl-12">
+      <div class="card shadow">
+        <div class="card-header bg-gradient-danger opacity-8 text-white border-0">
+          <div class="row align-items-center">
+            <div class="col d-flex align-items-center">
+              <i class="ni ni-collection text-white me-3 fs-4" style="font-size: 1.4rem;margin-right:0.8em;"></i>
+              <h3 class="mb-0 text-white">{{ 'templateList.header.title' | translate }}</h3>
+            </div>
+            <div class="col text-right">
+              <div class="d-inline-flex align-items-center bg-white rounded px-2" style="height: 42px;">
+                <!-- Search Input Group -->
+                <div class="input-group input-group-sm input-group-alternative" style="width: 200px;">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                  </div>
+                  <input class="form-control border-0"
+                        placeholder="{{ 'templateList.header.searchPlaceholder' | translate }}"
+                        type="text"
+                        [(ngModel)]="searchTerm"
+                        name="search" />
+                </div>
+                <!-- Loop Button -->
+                <button class="btn btn-sm btn-outline-secondary border-0 ms-2" style="padding: 0.4rem 0.6rem;" >
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body p-4">
+          <div class="template-list-container" style="max-height: none; overflow-y: auto;">
+            <div class="row">
+              <!-- Template Cards -->
+              <ng-container *ngFor="let template of filteredTemplates">
+                <div class="col-lg-4 col-md-6 mb-4">
+                  <div class="card card-lift--hover shadow-sm border-0" style="height: 100%;">
+                    <img class="card-img-top" [src]="template.previewImageUrl" alt="Aperçu du template"
+                      style="height: 250px; object-fit: cover;">
+                    <div class="card-body py-3 d-flex flex-column">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title text-primary mb-0">{{ template.name || ('templateList.card.defaultName' | translate) }}</h5>
+                        <span class="badge badge-pill badge-primary">{{ 'templateList.card.categoryBadge' | translate }}</span>
+                      </div>
+                      <p class="text-sm text-muted mb-0 mt-auto">
+                        <i class="far fa-calendar-alt mr-1"></i> {{ 'templateList.card.updatedOn' | translate:{ date: (template.dateCreation | date:'dd/MM/yyyy') } }}
+                      </p>
+                    </div>
+                    <div class="card-footer bg-transparent py-3">
+                      <div class="row no-gutters">
+                        <div class="col-6">
+                          <button type="button" class="btn btn-sm btn-outline-primary btn-block" 
+                                  (click)="openTemplateModal(template)">
+                            <i class="fas fa-check mr-1"></i> {{ 'templateList.actions.select' | translate }}
+                          </button>
+                        </div>
+                        <div class="col-6 pl-1">
+                          <button type="button" class="btn btn-sm btn-outline-danger btn-block" 
+                                  (click)="template.id ? deleteTemplate(template.id) : null">
+                            <i class="fas fa-trash mr-1"></i> {{ 'templateList.actions.delete' | translate }}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+              
+              <!-- Create New Template Card -->
+              <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card bg-secondary shadow-sm border-0 card-lift--hover" (click)="goToTemplateBuilder()" 
+                     style="cursor: pointer; height: 100%;">
+                  <div class="card-body d-flex flex-column justify-content-center align-items-center" style="min-height: 350px;">
+                    <div class="icon icon-shape icon-shape-primary rounded-circle mb-3">
+                      <i class="fas fa-file-alt" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <h5 class="text-primary">{{ 'templateList.createNewTemplateCard.title' | translate }}</h5>
+                    <p class="text-muted text-center mt-2 mb-0">{{ 'templateList.createNewTemplateCard.description' | translate }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Empty State (visible when no templates are available) -->
+            <div *ngIf="templates?.length === 0" class="text-center py-5">
+              <div class="icon icon-shape icon-shape-primary rounded-circle mb-3 mx-auto">
+                <i class="fas fa-folder-open"></i>
+              </div>
+              <h4>{{ 'templateList.emptyState.noTemplatesTitle' | translate }}</h4>
+              <p class="text-muted">{{ 'templateList.emptyState.noTemplatesDescription' | translate }}</p>
+              <button type="button" class="btn btn-primary" (click)="goToTemplateBuilder()">
+                <i class="fas fa-plus mr-1"></i> {{ 'templateList.emptyState.createButton' | translate }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Template Form Modal -->
+<div class="modal fade show" *ngIf="selectedTemplate" tabindex="-1" role="dialog" id="templateFormModal"
+  style="display: block; background-color: rgba(0,0,0,0.5); overflow-y: auto;">
+  <div class="modal-dialog modal-lg d-flex align-items-center justify-content-center" role="document" style="min-height: 100vh;max-width: 900px;">
+    <div class="modal-content">
+      <div class="modal-header sticky-top bg-white">
+        <h5 class="modal-title">{{ selectedTemplate.name || ('templateList.modal.titlePrefix' | translate) }}{{ 'templateList.modal.valueEntry' | translate }}</h5>
+        <button type="button" class="close" (click)="closeTemplateModal()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" style="max-height: calc(100vh - 150px); overflow-y: auto;">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" #templateForm>
+          <!-- Sections Actives -->
+          <h6 class="heading-small text-muted mb-4" style="color: grey;">{{ 'templateList.modal.sections.active' | translate }}</h6>
+          <div class="pl-lg-4">
+            <div *ngFor="let section of selectedTemplate?.actif" class="form-section mb-5">
+              <h5 style="font-size: 1rem; color: #3b3e50; margin-bottom: 15px;">{{ section.name }}</h5>
+              <div class="field-list">
+                <div *ngFor="let field of section.fields" class="mb-4">
+                  <label class="form-label">{{ field.label }}</label>
+                  <input type="number" [formControlName]="sanitizeLabel(field.label)"
+                    class="form-control form-control-alternative" required />
+                  <div
+                    *ngIf="form.get(sanitizeLabel(field.label))?.invalid && form.get(sanitizeLabel(field.label))?.touched"
+                    class="text-danger small">
+                    <div *ngIf="form.get(sanitizeLabel(field.label))?.errors?.['required']">{{ 'templateList.modal.validationErrors.required' | translate }}</div>
+                    <div *ngIf="form.get(sanitizeLabel(field.label))?.errors?.['min']">{{ 'templateList.modal.validationErrors.min' | translate }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border-top: 1px solid #dcdcdc; margin: 40px 0;">
+
+          <!-- Sections Passives -->
+          <h6 class="heading-small text-muted mb-4" style="color: grey;">{{ 'templateList.modal.sections.passive' | translate }}</h6>
+          <div class="pl-lg-4">
+            <div *ngFor="let section of selectedTemplate?.passif" class="form-section mb-5">
+              <h5 style="font-size: 1rem; color: #3b3e50; margin-bottom: 15px;">{{ section.name }}</h5>
+              <div class="field-list">
+                <div *ngFor="let field of section.fields" class="mb-4">
+                  <label class="form-label">{{ field.label }}</label>
+                  <input type="number" [formControlName]="sanitizeLabel(field.label)"
+                    class="form-control form-control-alternative" required />
+                  <div
+                    *ngIf="form.get(sanitizeLabel(field.label))?.invalid && form.get(sanitizeLabel(field.label))?.touched"
+                    class="text-danger small">
+                    <div *ngIf="form.get(sanitizeLabel(field.label))?.errors?.['required']">{{ 'templateList.modal.validationErrors.required' | translate }}</div>
+                    <div *ngIf="form.get(sanitizeLabel(field.label))?.errors?.['min']">{{ 'templateList.modal.validationErrors.min' | translate }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border-top: 1px solid #dcdcdc; margin: 40px 0;">
+
+          <!-- Boutons et conteneur pour le message -->
+          <h6 class="heading-small text-muted mb-4" style="color: grey;">{{ 'templateList.modal.sections.attachDmn' | translate }}</h6>
+          <div class="text-center mb-4">
+            <p class="text-muted mb-2">{{ 'templateList.modal.dmnSelection.instruction' | translate }}</p>
+            <!-- Conteneur du bouton de validation -->
+            <div class="d-flex justify-content-center">
+              <button type="button" class="btn btn-danger btn-sm" style="width: 180px;"
+                (mouseenter)="onHover('static')" 
+                (mousemove)="onMouseMove($event)" 
+                (mouseleave)="onHover('')" 
+                (click)="selectCompatibleDmn('static')">
+                <i class="fas fa-table me-1" style="margin-right:8px"></i> {{ 'templateList.modal.dmnSelection.validationButton' | translate }}
+              </button>
+            </div>
+
+              <!-- Conteneur pour le message de hover -->
+              <div *ngIf="hoverMessage" class="hover-message-container"
+                [ngStyle]="{'top': hoverY + 'px', 'left': hoverX + 'px', 'display': 'block', 'opacity': 1}">
+                <p style="margin: 0;">{{ hoverMessage }}</p>
+              </div>
+
+            <div *ngIf="selectedDmnDisplay" 
+                class="card mt-2" 
+                style="background-color: #f8f9fa; border: 1px solid #dee2e6; padding: 0.5rem 1rem;">
+              <div class="d-flex justify-content-end align-items-center py-1 w-100">
+                <div >
+                  <button
+                    type="button"
+                    class="btn btn-outline-primary btn-sm me-1 py-0 px-2"
+                    (click)="openPreviewModal(selectedDmnDisplay)"
+                    aria-label="Prévisualiser la règle"
+                    title="Prévisualiser la règle"
+                    style="font-size: 0.95rem;background: none; border: none;"
+                  >
+                    👁️
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-link btn-sm text-muted p-0"
+                    (click)="detachDmn()"
+                    aria-label="Fermer"
+                    title="Fermer"
+                    style="font-size: 1.25rem; line-height: 1;"
+                  >
+                    &times;
+                  </button>
+                </div>
+              </div>
+
+              <div class="py-1">
+                <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.8rem;">
+                  Nom de la règle DMN
+                </small>
+                <p class="mb-0 text-dark fw-bold" style="font-size: 1.15rem; color: #222;">
+                  {{ selectedDmnDisplay.ruleKey }}
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Loading Spinner -->
+          <div *ngIf="isLoadingDmns" class="d-flex flex-column justify-content-center align-items-center py-4"
+            style="height: 12vh;">
+            <div class="d-flex justify-content-center">
+              <div class="spinner-custom" role="status">
+                <span class="visually-hidden"></span>
+              </div>
+            </div>
+            <p class="mt-3 text-muted">{{ 'templateList.modal.pleaseWait' | translate }}</p>
+          </div>
+
+          <!-- Input file caché pour l'importation du DMN -->
+          <input type="file" #dmnFileInput style="display: none;" accept=".dmn" (change)="onDmnFileSelected($event)" />
+
+          <!-- Modal pour sélection de DMN -->
+          <div class="modal fade show d-block" *ngIf="isDmnListVisible" tabindex="-1" role="dialog"
+          style="background: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1060;">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">{{ 'templateList.modal.selectDmn' | translate }}</h5>
+                  <button type="button" class="close" (click)="closeModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                  <!-- Liste paginée -->
+                  <div *ngFor="let dmn of paginatedDmns()" class="mb-2 d-flex gap-2 align-items-center">
+                    <button type="button" class="btn btn-danger btn-sm flex-grow-1" (click)="selectDmnFromList(dmn)">
+                      {{ dmn.ruleKey }}
+                    </button>
+                    <button type="button" class="btn btn-outline-light btn-sm preview-btn" (click)="openPreviewModal(dmn)" style="background: none; border: none;">
+                      👁️
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm ms-1" (click)="deleteDmn(dmn)" style="background: none; border: none;">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+
+                  <!-- Pagination -->
+                  <div class="d-flex justify-content-between align-items-center mt-3">
+                    <button class="btn btn-outline-secondary btn-sm" type="button" (click)="prevPage()" [disabled]="currentPage === 1">
+                      {{ 'templateList.modal.previous' | translate }}
+                    </button>
+                    <span class="text-muted small">Page {{ currentPage }} / {{ totalPages }}</span>
+                    <button class="btn btn-outline-secondary btn-sm" type="button" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                      {{ 'templateList.modal.next' | translate }}
+                    </button>
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Modale de preview -->
+              <div class="modal fade show d-block" *ngIf="isPreviewModalVisible" tabindex="-1" role="dialog"
+                style="background: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 1070;">
+                <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+                  <div class="modal-content" style="max-height: 90vh; overflow-y: auto;">
+                    <div class="modal-header border-bottom-0">
+                      <h5 class="modal-title">Prévisualisation de la règle DMN</h5>
+                      <button type="button" class="btn-close" (click)="closePreviewModal()" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <table class="table table-bordered table-sm align-middle">
+                        <thead class="table-light">
+                          <tr>
+                            <th>Expression</th>
+                            <th>Opérateur</th>
+                            <th>Valeur</th>
+                            <th>Message d'erreur</th>
+                            <th>Sévérité</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let rule of previewedRules"
+                            [ngStyle]="{
+                              'background-color': rule.severite?.toLowerCase() === 'blocking' ? '#f8d7da' :
+                                                rule.severite?.toLowerCase() === 'warning' ? '#fff3cd' : 'transparent',
+                              'color': rule.severite?.toLowerCase() === 'blocking' ? '#721c24' :
+                                      rule.severite?.toLowerCase() === 'warning' ? '#856404' : '#212529'
+                            }">
+                            <td>{{ rule.expression }}</td>
+                            <td>{{ rule.condition }}</td>
+                            <td>{{ rule.value }}</td>
+                            <td>{{ rule.messageErreur }}</td>
+                            <td>{{ rule.severite }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+          <!-- Loading Spinner -->
+          <div *ngIf="isLoadingDesigns" class="d-flex flex-column justify-content-center align-items-center py-4"
+            style="height: 12vh;">
+            <div class="d-flex justify-content-center">
+              <div class="spinner-custom" role="status">
+                <span class="visually-hidden"></span>
+              </div>
+            </div>
+            <p class="mt-3 text-muted">{{ 'templateList.modal.pleaseWait' | translate }}</p>
+          </div>
+
+          <hr style="border-top: 1px solid #dcdcdc; margin: 40px 0;">
+
+          <!-- Champ pour le nom de l'entreprise -->
+          <div class="form-group" *ngIf="form?.get('companyName')">
+            <label for="companyName" class="form-label">{{ 'templateList.modal.companyNameLabel' | translate }}</label>
+            <input type="text" id="companyName" formControlName="companyName"
+              class="form-control form-control-alternative" placeholder="Ex : Société XYZ" required />
+            <div *ngIf="form.get('companyName')?.invalid && form.get('companyName')?.touched" class="text-danger small">
+              <div *ngIf="form.get('companyName')?.errors?.['required']">{{ 'templateList.modal.validationErrors.required' | translate }}</div>
+            </div>
+          </div>
+
+          <!-- Bouton de Soumission -->
+          <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="button" (click)="onPreview()" class="btn btn-outline-danger d-flex align-items-center gap-3">
+              <i class="bi bi-eye" style="margin-right:5px"></i>
+             {{ 'templateList.modal.previewReport' | translate }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de prévisualisation (placé en dehors du form) -->
+<div class="modal fade" id="previewModal" #previewModalRef tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header sticky-top bg-white">
+        <h5 class="modal-title" id="previewModalLabel">{{ 'templateList.modal.reportPreviewTitle' | translate }}</h5>
+        <button type="button" class="btn-close" (click)="closePreview()" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body" style="max-height: 70vh;">
+        <!-- Navigation onglets -->
+        <ul class="nav nav-tabs mb-3" id="modalTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button 
+              class="nav-link" 
+              [ngClass]="{'active': activeTab === 'preview'}"
+              id="preview-tab" 
+              (click)="switchTab('preview')"
+              type="button" 
+              role="tab" 
+              aria-controls="preview-content" 
+              [attr.aria-selected]="activeTab === 'preview'">
+              {{ 'templateList.modal.tabs.pdfPreview' | translate }}
+            </button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button 
+              class="nav-link" 
+              [ngClass]="{'active': activeTab === 'validation'}"
+              id="validation-tab" 
+              (click)="switchTab('validation')"
+              type="button" 
+              role="tab" 
+              aria-controls="validation-content" 
+              [attr.aria-selected]="activeTab === 'validation'">
+              {{ 'templateList.modal.tabs.validationReport' | translate }}
+            </button>
+          </li>
+        </ul>
+
+        <!-- Contenu des onglets -->
+        <div class="tab-content">
+          <!-- Onglet Aperçu PDF -->
+          <div class="tab-pane fade" [ngClass]="{'show active': activeTab === 'preview'}" 
+               id="preview-content" role="tabpanel" aria-labelledby="preview-tab">
+            <div *ngIf="previewError" class="alert alert-danger">
+              {{ previewError }}
+            </div>
+            
+            <div *ngIf="previewReport && !previewError" class="pdf-container" style="height: 800px;">
+              <iframe [src]="previewReport | safe:'resourceUrl'" width="100%" height="100%" frameborder="0"></iframe>
+            </div>
+          </div>
+
+          <!-- Onglet Rapport de Validation Amélioré -->
+          <div class="tab-pane fade" [ngClass]="{'show active': activeTab === 'validation'}"
+              id="validation-content" role="tabpanel" aria-labelledby="validation-tab">
+      
+  <!-- État vide -->
+  <div *ngIf="evaluationResults.length === 0" class="text-center py-5">
+    <div class="mb-4">
+      <i class="fas fa-clipboard-check fa-4x text-muted"></i>
+    </div>
+    <h5 class="fw-light text-muted"> {{ 'templateList.modal.validation.noResults' | translate }}</h5>
+    <p class="text-muted small"> {{ 'templateList.modal.validation.resultsInfo' | translate }}</p>
+  </div>
+
+  <!-- Contenu avec résultats -->
+  <div *ngIf="evaluationResults.length > 0" class="validation-results-container">
+    
+    <!-- Carte de résumé avec progression -->
+    <div class="card shadow-sm mb-4 border-0">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-4 d-flex align-items-center">
+          <i class="fas fa-chart-pie me-2 text-primary" style="margin-right: 10px;"></i>
+          <span>{{ 'templateList.modal.validation.summary' | translate }}</span>
+        </h5>
+        
+        <!-- Barre de progression indiquant succès global -->
+        <div class="mb-4">
+          <div class="d-flex justify-content-between mb-1 small">
+            <span>{{ 'templateList.modal.validation.rate' | translate }}</span>
+            <span class="fw-bold">{{(successValidations.length / evaluationResults.length * 100).toFixed(0)}}%</span>
+          </div>
+          <div class="progress" style="height: 8px;">
+            <div class="progress-bar bg-success" role="progressbar" 
+                 [style.width]="(successValidations.length / evaluationResults.length * 100) + '%'"
+                 aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+        
+        <!-- Indicateurs de statut -->
+        <div class="row g-3">
+          <!-- Erreurs -->
+          <div class="col-md-4">
+            <div class="card h-100" [ngClass]="{'border-danger': blockingErrors.length > 0, 'border-light': blockingErrors.length === 0}">
+              <div class="card-body p-3 d-flex align-items-center">
+                <div class="status-icon me-3" [ngClass]="{'bg-danger-light': blockingErrors.length > 0, 'bg-light': blockingErrors.length === 0}">
+                  <i class="fas fa-times-circle" [ngClass]="{'text-danger': blockingErrors.length > 0, 'text-muted': blockingErrors.length === 0}"></i>
+                </div>
+                <div>
+                  <div class="h2 mb-0 fw-bold" [ngClass]="{'text-danger': blockingErrors.length > 0, 'text-muted': blockingErrors.length === 0}">
+                    {{blockingErrors.length}}
+                  </div>
+                  <div class="small text-muted">{{ 'templateList.modal.validation.criticalErrors' | translate }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Avertissements -->
+          <div class="col-md-4">
+            <div class="card h-100" [ngClass]="{'border-warning': warnings.length > 0, 'border-light': warnings.length === 0}">
+              <div class="card-body p-3 d-flex align-items-center">
+                <div class="status-icon me-3" [ngClass]="{'bg-warning-light': warnings.length > 0, 'bg-light': warnings.length === 0}">
+                  <i class="fas fa-exclamation-triangle" [ngClass]="{'text-warning': warnings.length > 0, 'text-muted': warnings.length === 0}"></i>
+                </div>
+                <div>
+                  <div class="h2 mb-0 fw-bold" [ngClass]="{'text-warning': warnings.length > 0, 'text-muted': warnings.length === 0}">
+                    {{warnings.length}}
+                  </div>
+                  <div class="small text-muted">{{ 'templateList.modal.validation.warnings' | translate }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Succès -->
+          <div class="col-md-4">
+            <div class="card h-100" [ngClass]="{'border-success': successValidations.length > 0, 'border-light': successValidations.length === 0}">
+              <div class="card-body p-3 d-flex align-items-center">
+                <div class="status-icon me-3" [ngClass]="{'bg-success-light': successValidations.length > 0, 'bg-light': successValidations.length === 0}">
+                  <i class="fas fa-check-circle" [ngClass]="{'text-success': successValidations.length > 0, 'text-muted': successValidations.length === 0}"></i>
+                </div>
+                <div>
+                  <div class="h2 mb-0 fw-bold" [ngClass]="{'text-success': successValidations.length > 0, 'text-muted': successValidations.length === 0}">
+                    {{successValidations.length}}
+                  </div>
+                  <div class="small text-muted">{{ 'templateList.modal.validation.passedValidations' | translate }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Section des détails avec accordéon -->
+    <div class="accordion validation-details-accordion shadow-sm">
+      
+      <!-- Section Erreurs -->
+      <div class="accordion-item" *ngIf="blockingErrors.length > 0">
+        <h2 class="accordion-header" id="errorsHeading">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                  data-bs-target="#errorsCollapse" aria-expanded="true" aria-controls="errorsCollapse">
+            <i class="fas fa-times-circle text-danger me-2"></i>
+            <span class="fw-medium">{{ 'templateList.modal.validation.blockingErrorsCount' | translate:{ count: blockingErrors.length } }}</span>
+          </button>
+        </h2>
+        <div id="errorsCollapse" class="accordion-collapse collapse show" aria-labelledby="errorsHeading">
+          <div class="accordion-body p-0">
+            <div class="list-group list-group-flush">
+              <div *ngFor="let error of blockingErrors; let i = index" 
+                   class="list-group-item list-group-item-action border-0 ps-4 pe-3 py-3">
+                <div class="d-flex align-items-start">
+                  <div class="error-number me-3 text-danger fw-bold" style="font-size: 1rem;">{{i+1}}.</div>
+                  <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between mb-2 align-items-center">
+                      <h6 class="fw-bold mb-0 text-danger" style="font-size: 1rem;">{{error.expression}}</h6>
+                      <span class="badge bg-danger rounded-pill ms-2">{{error.condition}}</span>
+                    </div>
+                    <p class="mb-2 validation-message">{{error.messageErreur}}</p>
+                    <div class="d-flex align-items-center small text-muted">
+                      <i class="fas fa-info-circle me-1" style="margin-right:10px"></i>
+                      <span>
+                        {{ 'templateList.modal.validation.expression' | translate }}:
+                        <span class="text-dark fw-semibold">{{ error.expression }}</span> |
+                        {{ 'templateList.modal.validation.condition' | translate }}:
+                        <span class="text-dark fw-semibold">{{ error.condition }}</span> |
+                        {{ 'templateList.modal.validation.evaluatedValue' | translate }}:
+                        <span class="text-danger fw-semibold">{{ error.evaluatedValue }}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Section Avertissements -->
+      <div class="accordion-item" *ngIf="warnings.length > 0">
+        <h2 class="accordion-header" id="warningsHeading">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                  data-bs-target="#warningsCollapse" aria-expanded="true" aria-controls="warningsCollapse">
+            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+            <span class="fw-medium">{{ 'templateList.modal.validation.warningsCount' | translate:{ count: warnings.length } }}</span>
+          </button>
+        </h2>
+        <div id="warningsCollapse" class="accordion-collapse collapse show" aria-labelledby="warningsHeading">
+          <div class="accordion-body p-0">
+            <div class="list-group list-group-flush">
+              <div *ngFor="let warning of warnings; let i = index" 
+                   class="list-group-item list-group-item-action border-0 ps-4 pe-3 py-3">
+                <div class="d-flex align-items-start">
+                  <div class="warning-number me-3 text-warning fw-bold" style="font-size: 1rem;">{{i+1}}.</div>
+                  <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between mb-2 align-items-center">
+                      <h6 class="fw-bold mb-0 text-warning" style="font-size: 1rem;">{{warning.expression}}</h6>
+                      <span class="badge bg-warning text-dark rounded-pill ms-2">{{warning.condition}}</span>
+                    </div>
+                    <p class="mb-2 validation-message">{{warning.messageErreur}}</p>
+                    <div class="d-flex align-items-center small text-muted">
+                      <i class="fas fa-info-circle me-1" style="margin-right:10px"></i>
+                      <span>
+                        {{ 'templateList.modal.validation.expression' | translate }}:
+                        <span class="text-dark fw-semibold">{{ warning.expression }}</span> |
+                        {{ 'templateList.modal.validation.condition' | translate }}:
+                        <span class="text-dark fw-semibold">{{ warning.condition }}</span> |
+                        {{ 'templateList.modal.validation.evaluatedValue' | translate }}:
+                        <span class="text-warning fw-semibold">{{ warning.evaluatedValue }}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Section Validations Réussies -->
+      <div class="accordion-item" *ngIf="successValidations.length > 0">
+        <h2 class="accordion-header" id="successHeading">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" 
+                  data-bs-target="#successCollapse" aria-expanded="true" aria-controls="successCollapse">
+            <i class="fas fa-check-circle text-success me-2"></i>
+            <span class="fw-medium"> {{ 'templateList.modal.validation.successfulValidationsCount' | translate:{ count: successValidations.length } }}</span>
+          </button>
+        </h2>
+        <div id="successCollapse" class="accordion-collapse collapse show" aria-labelledby="successHeading">
+          <div class="accordion-body p-0">
+            <div class="list-group list-group-flush">
+              <div *ngFor="let success of successValidations; let i = index" 
+                   class="list-group-item list-group-item-action border-0 ps-4 pe-3 py-3">
+                <div class="d-flex align-items-start">
+                  <div class="success-number me-3 text-success fw-bold" style="font-size: 1rem;">{{i+1}}.</div>
+                  <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between mb-1 align-items-center">
+                      <h6 class="fw-bold mb-0 text-success" style="font-size: 1rem;">{{success.expression}}</h6>
+                      <span class="badge bg-success rounded-pill ms-2">{{success.condition}}</span>
+                    </div>
+                    <div class="d-flex align-items-center small text-muted">
+                      <i class="fas fa-info-circle me-1" style="margin-right:10px"></i>
+                      <span>
+                        {{ 'templateList.modal.validation.expression' | translate }}:
+                        <span class="text-dark fw-semibold">{{ success.expression }}</span> |
+                        {{ 'templateList.modal.validation.condition' | translate }}:
+                        <span class="text-dark fw-semibold">{{ success.condition }}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <div class="modal-footer"> 
+        <button type="button" class="btn btn-secondary" (click)="closePreview()">
+          {{ 'templateList.modal.actions.closePreview' | translate }}
+        </button>
+
+        <!-- Export Validation Report as CSV -->
+        <button type="button" class="btn btn-success" (click)="exportToExcel()">
+          <i class="fas fa-file-excel"></i> {{ 'templateList.modal.actions.exportValidationReportCsv' | translate }}
+        </button>
+
+        <button type="button" class="btn btn-danger"
+                *ngIf="previewReport && !hasBlockingErrors"
+                (click)="onSubmit()" data-bs-dismiss="modal">
+          <i class="fas fa-paper-plane"></i> {{ 'templateList.modal.actions.submitFinancialStatement' | translate }}
+        </button>
+      </div>
+
+    
+  </div>
+</div>

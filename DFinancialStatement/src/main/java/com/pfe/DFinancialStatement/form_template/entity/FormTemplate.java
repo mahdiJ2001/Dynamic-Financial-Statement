@@ -1,10 +1,14 @@
 package com.pfe.DFinancialStatement.form_template.entity;
 
+import com.pfe.DFinancialStatement.dmn_rule.entity.DmnRule;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
@@ -26,4 +30,5 @@ public class FormTemplate {
     @CreationTimestamp
     @Column(name = "datecreation", updatable = false)
     private LocalDateTime dateCreation;
+
 }

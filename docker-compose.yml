@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:13-alpine
+    container_name: dfinancialstatement_postgres
+    environment:
+      POSTGRES_DB: dynamic_financial_statement
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mahdi001
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./DFinancialStatement
+      dockerfile: Dockerfile
+    container_name: dfinancialstatement_backend
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/dynamic_financial_statement
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: mahdi001
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: mahdijellali2001@gmail.com
+      SPRING_MAIL_PASSWORD: bsrawshukvbumvyy
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+      JWT_SECRET: EV3O7CEbdzGJgU7xL2TbBqGHL3X/AXOQKFEWSd9ZZw4=
+      JWT_EXPIRATION: 86400000
+      OPENROUTER_API_URL: https://openrouter.ai/api/v1/chat/completions
+      OPENROUTER_API_KEY: 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
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID: 379655198814-dvlujjm38s5bfdfs4rj19d0tfm4jlcfd.apps.googleusercontent.com
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET: 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
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_SCOPE: openid,profile,email
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_REDIRECT_URI: http://localhost:8081/login/oauth2/code/google
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_NAME: Google
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_GOOGLE_AUTHORIZATION_URI: https://accounts.google.com/o/oauth2/v2/auth
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_GOOGLE_TOKEN_URI: https://oauth2.googleapis.com/token
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_GOOGLE_USER_INFO_URI: https://www.googleapis.com/oauth2/v3/userinfo
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_GOOGLE_USER_NAME_ATTRIBUTE: sub
+      CAMUNDA_BPM_HISTORY_TIME_TO_LIVE: 180
+    depends_on:
+      - postgres-db
+
+  frontend:
+    build:
+      context: ./FinancialFront
+      dockerfile: Dockerfile
+    container_name: dfinancialstatement_frontend
+    ports:
+      - "4200:80"
+
+volumes:
+  postgres_data:

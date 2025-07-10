@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -17,35 +19,34 @@ public class FormTemplateController {
     @Autowired
     private FormTemplateService formTemplateService;
 
-    // Save a new form template
     @PostMapping
     public ResponseEntity<FormTemplate> saveTemplate(@RequestBody FormTemplateDTO templateDTO) {
         FormTemplate savedTemplate = formTemplateService.saveFormTemplate(templateDTO);
         return ResponseEntity.ok(savedTemplate);
     }
 
-    // Get all templates
     @GetMapping
     public ResponseEntity<List<FormTemplate>> getAllTemplates() {
         List<FormTemplate> templates = formTemplateService.getAllTemplates();
         return ResponseEntity.ok(templates);
     }
 
-    // Get a template by ID
     @GetMapping("/{id}")
     public ResponseEntity<FormTemplate> getTemplateById(@PathVariable Long id) {
         Optional<FormTemplate> template = formTemplateService.getTemplateById(id);
         return template.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // Delete a template by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteTemplate(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteTemplate(@PathVariable Long id) {
         boolean deleted = formTemplateService.deleteTemplate(id);
         if (deleted) {
-            return ResponseEntity.ok("Template deleted successfully");
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Template deleted successfully");
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+
 }
