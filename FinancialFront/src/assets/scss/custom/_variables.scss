@@ -1022,3 +1022,26 @@ $footer-heading-font-size: $font-size-sm !default;
 // Import Bootstrap variable defaults
 
 @import "bootstrap/scss/variables";
+
+// Polyfill for Bootstrap 4.3+ $theme-colors-rgb support
+@function to-rgb($color) {
+  @return red($color), green($color), blue($color);
+}
+
+$theme-colors-rgb: (
+);
+
+@each $color, $value in $theme-colors {
+  $theme-colors-rgb: map-merge($theme-colors-rgb,
+      ($color: to-rgb($value)));
+}
+
+// Polyfill for Bootstrap 4.3+ $theme-colors-text support
+$theme-colors-text: (
+  ) !default;
+
+@each $color, $value in $theme-colors {
+  $theme-colors-text: map-merge($theme-colors-text,
+      ($color: color-contrast($value))
+  );
+}
