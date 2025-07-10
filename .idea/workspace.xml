@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="0c44d7c2-93f9-4bda-8d06-0233b3aebb1f" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/FinancialFront/.editorconfig" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/.vscode/extensions.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/.vscode/launch.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/.vscode/tasks.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/angular.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/public/favicon.ico" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/tsconfig.app.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/tsconfig.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FinancialFront/tsconfig.spec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/financial_statement/controller/FinancialStatementController.java" beforeDir="false" afterPath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/financial_statement/controller/FinancialStatementController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/financial_statement/dto/FinancialStatementDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/financial_statement/dto/FinancialStatementDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/financial_statement/entity/FinancialStatement.java" beforeDir="false" afterPath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/financial_statement/entity/FinancialStatement.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/financial_statement/service/FinancialStatementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/financial_statement/service/FinancialStatementService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/form_template/entity/FormTemplate.java" beforeDir="false" afterPath="$PROJECT_DIR$/DFinancialStatement/src/main/java/com/pfe/DFinancialStatement/form_template/entity/FormTemplate.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FinancialFront" beforeDir="false" afterPath="$PROJECT_DIR$/FinancialFront" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "mahdiJ2001"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/mahdiJ2001/Dynamic-Financial-Statement.git",
+    "accountId": "1c7ce6bf-65d4-4ca4-802c-17976b25079f"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 3
+}]]></component>
+  <component name="ProjectId" id="2tnXv3u7SVn02FiqKBcQ4mQu4VG" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "dmn-in-postgres",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/ASUS/Desktop/Dynamic Financial Statement/DFinancialStatement"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="0c44d7c2-93f9-4bda-8d06-0233b3aebb1f" name="Changes" comment="" />
+      <created>1740989039296</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1740989039296</updated>
+    </task>
+    <servers />
+  </component>
+</project>
