@@ -4,9 +4,10 @@ A full-stack platform for automated creation, validation, and report generation 
 
 ## Demo Video
 
-[![Watch Demo](https://res.cloudinary.com/dz2o8ormn/image/upload/v1691428839/DemoDFS_hflmsi.jpg)](https://player.cloudinary.com/embed/?cloud_name=dz2o8ormn&public_id=DemoDFS_hflmsi&profile=cld-default)
+[![Watch Demo](https://res.cloudinary.com/dz2o8ormn/video/upload/so_0/eo_frame/DemoDFS_hflmsi.jpg)](https://player.cloudinary.com/embed/?cloud_name=dz2o8ormn&public_id=DemoDFS_hflmsi&profile=cld-default)
 
 *(Click the image above to watch the demo video)*
+
 
 ## Features
 
